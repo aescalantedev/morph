@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:morph/l10n/app_localizations.dart';
 import '../../../converter/domain/entities/media_file.dart';
 import '../../../converter/presentation/bloc/converter_bloc.dart';
+import '../../../converter/presentation/bloc/converter_event.dart';
 import '../../../converter/presentation/bloc/converter_state.dart';
 import '../../../../core/theme/app_theme.dart';
 
@@ -68,6 +69,33 @@ class HistoryPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (history.isNotEmpty) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      localizations.recentActivity,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.onSurface(context),
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () {
+                        context.read<ConverterBloc>().add(const ClearHistoryEvent());
+                      },
+                      icon: Icon(Icons.delete_outline, size: 18, color: AppTheme.error(context)),
+                      label: Text(
+                        localizations.clearHistory,
+                        style: TextStyle(color: AppTheme.error(context), fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+              ],
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
@@ -78,7 +106,7 @@ class HistoryPage extends StatelessWidget {
                   child: history.isEmpty
                       ? Center(
                           child: Text(
-                            'El historial está vacío.',
+                            localizations.historyEmpty,
                             style: TextStyle(color: AppTheme.onSurfaceVariant(context), fontSize: 13),
                           ),
                         )

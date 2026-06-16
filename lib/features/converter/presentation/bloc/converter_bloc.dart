@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:archive/archive_io.dart';
 import '../../../../core/di/injection_container.dart' as di;
 import '../../../../services/notification_service.dart';
+import '../../../../services/history_storage_service.dart';
 import '../../../settings/presentation/bloc/settings_bloc.dart';
 import '../../domain/entities/media_file.dart';
 import '../../domain/usecases/convert_file_usecase.dart';
@@ -25,10 +26,14 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
   /// Use case for probing media duration.
   final GetMediaDurationUseCase getMediaDurationUseCase;
 
+  /// Service that manages the persistence of conversion history.
+  final HistoryStorageService historyStorage;
+
   /// Creates a [ConverterBloc] with required usecases and sets up event handlers.
   ConverterBloc({
     required this.convertFileUseCase,
     required this.getMediaDurationUseCase,
+    required this.historyStorage,
   }) : super(ConverterState.initial()) {
     on<AddFilesEvent>(_onAddFiles);
     on<RemoveFileEvent>(_onRemoveFile);
@@ -42,6 +47,8 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
     on<StartConversionEvent>(_onStartConversion);
     on<ResetConverterEvent>(_onResetConverter);
     on<ToggleShouldZipEvent>(_onToggleShouldZip);
+    on<LoadHistoryEvent>(_onLoadHistory);
+    on<ClearHistoryEvent>(_onClearHistory);
 
     _initializeDefaultSavePath();
   }
@@ -143,7 +150,7 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
   }
 
   /// Event handler for receiving final statuses for individual files.
-  void _onUpdateFileStatus(UpdateFileStatusEvent event, Emitter<ConverterState> emit) {
+  Future<void> _onUpdateFileStatus(UpdateFileStatusEvent event, Emitter<ConverterState> emit) async {
     final updatedQueue = state.queue.map((file) {
       if (file.id == event.id) {
         final updatedFile = file.copyWith(
@@ -170,6 +177,7 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
     List<MediaFile> updatedHistory = List<MediaFile>.from(state.history);
     if (event.status == ConversionStatus.completed || event.status == ConversionStatus.failed) {
       updatedHistory = List<MediaFile>.from(state.history)..insert(0, updatedFile);
+      await historyStorage.writeHistory(updatedHistory);
     }
 
     emit(state.copyWith(queue: updatedQueue, history: updatedHistory));
@@ -285,6 +293,18 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
   /// Event handler to toggle whether multiple converted files should be bundled into a ZIP file.
   void _onToggleShouldZip(ToggleShouldZipEvent event, Emitter<ConverterState> emit) {
     emit(state.copyWith(shouldZip: event.shouldZip));
+  }
+
+  /// Event handler for loading persisted history from local storage.
+  Future<void> _onLoadHistory(LoadHistoryEvent event, Emitter<ConverterState> emit) async {
+    final history = await historyStorage.readHistory();
+    emit(state.copyWith(history: history));
+  }
+
+  /// Event handler for clearing conversion history in the state and storage.
+  Future<void> _onClearHistory(ClearHistoryEvent event, Emitter<ConverterState> emit) async {
+    await historyStorage.writeHistory([]);
+    emit(state.copyWith(history: []));
   }
 
   /// Resets the converter queue and halts any active operations.

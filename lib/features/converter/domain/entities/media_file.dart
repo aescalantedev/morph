@@ -118,4 +118,50 @@ class MediaFile extends Equatable {
         errorMessage,
         outputPath,
       ];
+
+  /// Creates a [MediaFile] from a JSON map.
+  factory MediaFile.fromJson(Map<String, dynamic> json) {
+    // Parse conversion status
+    ConversionStatus status = ConversionStatus.idle;
+    final statusStr = json['status'] as String?;
+    if (statusStr != null) {
+      status = ConversionStatus.values.firstWhere(
+        (e) => e.name == statusStr,
+        orElse: () => ConversionStatus.idle,
+      );
+    }
+
+    return MediaFile(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      path: json['path'] as String? ?? '',
+      sizeBytes: json['sizeBytes'] as int? ?? 0,
+      extension: json['extension'] as String? ?? '',
+      category: json['category'] as String? ?? '',
+      targetFormat: json['targetFormat'] as String? ?? '',
+      status: status,
+      progress: (json['progress'] as num?)?.toDouble() ?? 0.0,
+      durationSeconds: (json['durationSeconds'] as num?)?.toDouble(),
+      errorMessage: json['errorMessage'] as String?,
+      outputPath: json['outputPath'] as String?,
+    );
+  }
+
+  /// Converts this [MediaFile] instance into a JSON map.
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'path': path,
+      'sizeBytes': sizeBytes,
+      'extension': extension,
+      'category': category,
+      'targetFormat': targetFormat,
+      'status': status.name,
+      'progress': progress,
+      'durationSeconds': durationSeconds,
+      'errorMessage': errorMessage,
+      'outputPath': outputPath,
+    };
+  }
 }

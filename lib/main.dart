@@ -106,7 +106,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<ConverterBloc>(
           create: (context) {
-            final bloc = di.sl<ConverterBloc>();
+            final bloc = di.sl<ConverterBloc>()..add(const LoadHistoryEvent());
             if (_initialMediaFile != null) {
               // Set corresponding active tool tab first
               bloc.add(ChangeActiveToolEvent(_initialMediaFile!.category));

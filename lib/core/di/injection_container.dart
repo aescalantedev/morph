@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import '../../services/ffmpeg_service.dart';
 import '../../services/image_service.dart';
 import '../../services/settings_storage_service.dart';
+import '../../services/history_storage_service.dart';
 import '../../services/notification_service.dart';
 import '../../services/windows_registry_service.dart';
 import '../../services/file_opener_service.dart';
@@ -24,6 +25,7 @@ Future<void> initDI() async {
   sl.registerLazySingleton<FFmpegService>(() => FFmpegService());
   sl.registerLazySingleton<ImageService>(() => ImageService());
   sl.registerLazySingleton<SettingsStorageService>(() => SettingsStorageService());
+  sl.registerLazySingleton<HistoryStorageService>(() => HistoryStorageService());
   sl.registerLazySingleton<NotificationService>(() => NotificationService());
   sl.registerLazySingleton<WindowsRegistryService>(() => WindowsRegistryService());
   sl.registerLazySingleton<FileOpenerService>(() => FileOpenerService());
@@ -45,6 +47,7 @@ Future<void> initDI() async {
     () => ConverterBloc(
       convertFileUseCase: sl<ConvertFileUseCase>(),
       getMediaDurationUseCase: sl<GetMediaDurationUseCase>(),
+      historyStorage: sl<HistoryStorageService>(),
     ),
   );
   sl.registerLazySingleton(

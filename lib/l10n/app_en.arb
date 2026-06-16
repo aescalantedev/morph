@@ -62,5 +62,7 @@
   "settingsUpdated": "Settings updated",
   "windowsMenu": "Windows context menu",
   "windowsMenuDesc": "Add 'Convert with Morph' option to right-click file menu",
-  "themeColor": "Theme Color"
+  "themeColor": "Theme Color",
+  "clearHistory": "Clear History",
+  "historyEmpty": "The history is empty."
 }

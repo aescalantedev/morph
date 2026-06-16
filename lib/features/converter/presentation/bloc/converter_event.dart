@@ -143,3 +143,15 @@ class ToggleShouldZipEvent extends ConverterEvent {
   @override
   List<Object?> get props => [shouldZip];
 }
+
+/// Event dispatched to load the persisted conversion history from local storage.
+class LoadHistoryEvent extends ConverterEvent {
+  /// Creates a [LoadHistoryEvent].
+  const LoadHistoryEvent();
+}
+
+/// Event dispatched to clear all records in the conversion history.
+class ClearHistoryEvent extends ConverterEvent {
+  /// Creates a [ClearHistoryEvent].
+  const ClearHistoryEvent();
+}

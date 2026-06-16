@@ -475,6 +475,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Color de tema'**
   String get themeColor;
+
+  /// No description provided for @clearHistory.
+  ///
+  /// In es, this message translates to:
+  /// **'Limpiar Historial'**
+  String get clearHistory;
+
+  /// No description provided for @historyEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'El historial está vacío.'**
+  String get historyEmpty;
 }
 
 class _AppLocalizationsDelegate

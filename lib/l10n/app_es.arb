@@ -62,5 +62,7 @@
   "settingsUpdated": "Ajustes actualizados",
   "windowsMenu": "Menú contextual de Windows",
   "windowsMenuDesc": "Añadir opción 'Convertir con Morph' al hacer clic derecho en archivos",
-  "themeColor": "Color de tema"
+  "themeColor": "Color de tema",
+  "clearHistory": "Limpiar Historial",
+  "historyEmpty": "El historial está vacío."
 }

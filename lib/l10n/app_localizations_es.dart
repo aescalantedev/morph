@@ -202,4 +202,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get themeColor => 'Color de tema';
+
+  @override
+  String get clearHistory => 'Limpiar Historial';
+
+  @override
+  String get historyEmpty => 'El historial está vacío.';
 }
