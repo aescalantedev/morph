@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:morph/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../widgets/custom_title_bar.dart';
+import '../../../shared/presentation/widgets/desktop_header.dart';
 
 /// The primary shell page that provides a responsive layout for the application.
 ///
@@ -119,48 +120,14 @@ class MainShellPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Desktop Header
-                      Container(
-                        height: 80,
-                        padding: const EdgeInsets.symmetric(horizontal: 32),
-                        decoration: BoxDecoration(
-                          color: AppTheme.background(context),
-                          border: Border(bottom: BorderSide(color: AppTheme.border(context))),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              navigationShell.currentIndex == 0
-                                  ? localizations.dashboard
-                                  : (navigationShell.currentIndex == 1
-                                      ? localizations.newConversion
-                                      : (navigationShell.currentIndex == 2
-                                          ? localizations.history
-                                          : localizations.settings)),
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                            // Profile circle
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Image.network(
-                                'https://api.dicebear.com/7.x/notionists/svg?seed=Felix&backgroundColor=6366f1',
-                                width: 38,
-                                height: 38,
-                                errorBuilder: (context, error, stackTrace) => Container(
-                                  width: 38,
-                                  height: 38,
-                                  color: AppTheme.primary(context),
-                                  alignment: Alignment.center,
-                                  child: const Text('U', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                      DesktopHeader(
+                        title: navigationShell.currentIndex == 0
+                            ? localizations.dashboard
+                            : (navigationShell.currentIndex == 1
+                                ? localizations.newConversion
+                                : (navigationShell.currentIndex == 2
+                                    ? localizations.history
+                                    : localizations.settings)),
                       ),
                       Expanded(
                         child: navigationShell,
