@@ -125,4 +125,80 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get packageInZipDesc => 'Creates a single .zip file';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get theme => 'Appearance';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get themeSystem => 'System';
+
+  @override
+  String get systemLanguage => 'System default';
+
+  @override
+  String get notifications => 'Desktop notifications';
+
+  @override
+  String get notificationsDesc =>
+      'Show alerts when background conversions complete';
+
+  @override
+  String get defaultOutputPath => 'Default output path';
+
+  @override
+  String get systemInfo => 'System Information';
+
+  @override
+  String get engineStatus => 'Engine status';
+
+  @override
+  String get ffmpegActive => 'FFmpeg active (Pro-Convert Engine)';
+
+  @override
+  String get activeCodecs => 'Active codecs';
+
+  @override
+  String get activeCodecsDesc => 'H.264, MPEG-4, AAC, VP9, WebP, PNG, JPG, GIF';
+
+  @override
+  String get platform => 'Platform';
+
+  @override
+  String get morphVersion => 'Morph Version';
+
+  @override
+  String get freeSoftware => 'Free Software';
+
+  @override
+  String get freeSoftwareDesc =>
+      'Free tool without registration or conversion limits';
+
+  @override
+  String get conversionCompleteTitle => 'Conversion Complete';
+
+  @override
+  String get conversionCompleteBody =>
+      'All your files have been successfully processed!';
+
+  @override
+  String get settingsUpdated => 'Settings updated';
+
+  @override
+  String get windowsMenu => 'Windows context menu';
+
+  @override
+  String get windowsMenuDesc =>
+      'Add \'Convert with Morph\' option to right-click file menu';
+
+  @override
+  String get themeColor => 'Theme Color';
 }

@@ -42,9 +42,9 @@ class StatsGrid extends StatelessWidget {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.surfaceContainerLowest,
+        color: AppTheme.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.border(context)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -79,7 +79,7 @@ class StatsGrid extends StatelessWidget {
                         child: Text(
                           title.toUpperCase(),
                           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: AppTheme.outline,
+                                color: AppTheme.outline(context),
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 1.1,
                                 fontFamily: 'Inter',
@@ -112,7 +112,7 @@ class StatsGrid extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                   fontSize: 22,
                                   fontFamily: 'JetBrains Mono',
-                                  color: AppTheme.onSurface,
+                                  color: AppTheme.onSurface(context),
                                 ),
                           ),
                           const SizedBox(height: 2),
@@ -120,7 +120,7 @@ class StatsGrid extends StatelessWidget {
                             subtitle,
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   fontSize: 10,
-                                  color: AppTheme.onSurfaceVariant,
+                                  color: AppTheme.onSurfaceVariant(context),
                                   fontFamily: 'Inter',
                                 ),
                             maxLines: 1,
@@ -142,14 +142,14 @@ class StatsGrid extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Divider(color: AppTheme.surfaceContainerLow, height: 1),
+                  Divider(color: AppTheme.surfaceContainerLow(context), height: 1),
                   const SizedBox(height: 8),
                   Text(
                     secondaryMetric,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.onSurfaceVariant,
+                      color: AppTheme.onSurfaceVariant(context),
                       fontFamily: 'JetBrains Mono',
                     ),
                   ),
@@ -199,8 +199,8 @@ class StatsGrid extends StatelessWidget {
               title: localizations.totalConversions,
               value: totalConversions.toString(),
               icon: Icons.trending_up,
-              color: AppTheme.primary,
-              bg: AppTheme.primary.withValues(alpha: 0.08),
+              color: AppTheme.primary(context),
+              bg: AppTheme.primary(context).withValues(alpha: 0.08),
               subtitle: '+12% esta semana',
               sparklineValues: const [2.0, 4.0, 3.0, 7.0, 5.0, 8.0, 10.0],
               secondaryMetric: 'TASA ÉXITO: 98.4%',
@@ -210,8 +210,8 @@ class StatsGrid extends StatelessWidget {
               title: localizations.spaceSaved,
               value: spaceSaved,
               icon: Icons.storage_outlined,
-              color: AppTheme.secondary,
-              bg: AppTheme.secondary.withValues(alpha: 0.08),
+              color: AppTheme.secondary(context),
+              bg: AppTheme.secondary(context).withValues(alpha: 0.08),
               subtitle: 'Vía compresión',
               sparklineValues: const [3.0, 2.0, 4.0, 6.0, 8.0, 7.0, 9.0],
               secondaryMetric: 'COMPRESIÓN: 3.4x',
@@ -221,8 +221,8 @@ class StatsGrid extends StatelessWidget {
               title: localizations.activeTasks,
               value: activeTasksCount.toString(),
               icon: Icons.sync,
-              color: AppTheme.info,
-              bg: AppTheme.info.withValues(alpha: 0.08),
+              color: AppTheme.info(context),
+              bg: AppTheme.info(context).withValues(alpha: 0.08),
               subtitle: activeTasksCount > 0 ? 'Procesando...' : 'Sistema inactivo',
               sparklineValues: [0.0, 1.0, 0.0, 2.0, 1.0, 0.0, activeTasksCount.toDouble()],
               secondaryMetric: activeTasksCount > 0 ? 'COLA: $activeTasksCount ARCHIVOS' : 'COLA: VACÍA',

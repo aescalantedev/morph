@@ -23,9 +23,9 @@ class WeeklyActivityChart extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceContainerLowest,
+        color: AppTheme.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.border(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,7 +39,7 @@ class WeeklyActivityChart extends StatelessWidget {
                   Text(
                     'RENDIMIENTO SEMANAL',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppTheme.primary,
+                          color: AppTheme.primary(context),
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.2,
                         ),
@@ -56,27 +56,27 @@ class WeeklyActivityChart extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppTheme.primary.withValues(alpha: 0.08),
+                  color: AppTheme.primary(context).withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppTheme.primary.withValues(alpha: 0.2)),
+                  border: Border.all(color: AppTheme.primary(context).withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   children: [
                     Container(
                       width: 8,
                       height: 8,
-                      decoration: const BoxDecoration(
-                        color: AppTheme.primary,
+                      decoration: BoxDecoration(
+                        color: AppTheme.primary(context),
                         shape: BoxShape.circle,
                       ),
                     ),
                     const SizedBox(width: 6),
-                    const Text(
+                    Text(
                       'Actividad',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: AppTheme.primary,
+                        color: AppTheme.primary(context),
                         fontFamily: 'JetBrains Mono',
                       ),
                     ),
@@ -91,7 +91,13 @@ class WeeklyActivityChart extends StatelessWidget {
               builder: (context, constraints) {
                 return CustomPaint(
                   size: Size(constraints.maxWidth, constraints.maxHeight),
-                  painter: _ChartPainter(data: data),
+                  painter: _ChartPainter(
+                    data: data,
+                    primaryColor: AppTheme.primary(context),
+                    borderColor: AppTheme.border(context),
+                    onSurfaceVariantColor: AppTheme.onSurfaceVariant(context),
+                    primaryContainerColor: AppTheme.primaryContainer(context),
+                  ),
                 );
               },
             ),
@@ -104,13 +110,23 @@ class WeeklyActivityChart extends StatelessWidget {
 
 class _ChartPainter extends CustomPainter {
   final List<int> data;
+  final Color primaryColor;
+  final Color borderColor;
+  final Color onSurfaceVariantColor;
+  final Color primaryContainerColor;
 
-  _ChartPainter({required this.data});
+  _ChartPainter({
+    required this.data,
+    required this.primaryColor,
+    required this.borderColor,
+    required this.onSurfaceVariantColor,
+    required this.primaryContainerColor,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     final gridPaint = Paint()
-      ..color = AppTheme.border.withValues(alpha: 0.5)
+      ..color = borderColor.withValues(alpha: 0.5)
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
 
@@ -142,8 +158,8 @@ class _ChartPainter extends CustomPainter {
       final textPainter = TextPainter(
         text: TextSpan(
           text: val.toStringAsFixed(0),
-          style: const TextStyle(
-            color: AppTheme.onSurfaceVariant,
+          style: TextStyle(
+            color: onSurfaceVariantColor,
             fontSize: 10,
             fontFamily: 'JetBrains Mono',
           ),
@@ -168,8 +184,8 @@ class _ChartPainter extends CustomPainter {
       final textPainter = TextPainter(
         text: TextSpan(
           text: days[i % days.length],
-          style: const TextStyle(
-            color: AppTheme.onSurfaceVariant,
+          style: TextStyle(
+            color: onSurfaceVariantColor,
             fontSize: 10,
             fontFamily: 'Inter',
           ),
@@ -213,8 +229,8 @@ class _ChartPainter extends CustomPainter {
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          AppTheme.primary.withValues(alpha: 0.18),
-          AppTheme.primary.withValues(alpha: 0.00),
+          primaryColor.withValues(alpha: 0.18),
+          primaryColor.withValues(alpha: 0.00),
         ],
       ).createShader(Rect.fromLTRB(paddingLeft, 0, size.width, chartHeight))
       ..style = PaintingStyle.fill;
@@ -223,7 +239,7 @@ class _ChartPainter extends CustomPainter {
 
     // Draw the main line path
     final linePaint = Paint()
-      ..color = AppTheme.primary
+      ..color = primaryColor
       ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -232,11 +248,11 @@ class _ChartPainter extends CustomPainter {
 
     // Draw data points with glowing effect
     final pointPaint = Paint()
-      ..color = AppTheme.primary
+      ..color = primaryColor
       ..style = PaintingStyle.fill;
 
     final glowPaint = Paint()
-      ..color = AppTheme.primary.withValues(alpha: 0.3)
+      ..color = primaryColor.withValues(alpha: 0.3)
       ..style = PaintingStyle.fill;
 
     for (int i = 0; i < points.length; i++) {
@@ -271,7 +287,7 @@ class _ChartPainter extends CustomPainter {
         );
 
         final tooltipPaint = Paint()
-          ..color = AppTheme.primaryContainer
+          ..color = primaryContainerColor
           ..style = PaintingStyle.fill;
 
         canvas.drawRRect(
@@ -288,5 +304,10 @@ class _ChartPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _ChartPainter oldDelegate) => oldDelegate.data != data;
+  bool shouldRepaint(covariant _ChartPainter oldDelegate) =>
+      oldDelegate.data != data ||
+      oldDelegate.primaryColor != primaryColor ||
+      oldDelegate.borderColor != borderColor ||
+      oldDelegate.onSurfaceVariantColor != onSurfaceVariantColor ||
+      oldDelegate.primaryContainerColor != primaryContainerColor;
 }

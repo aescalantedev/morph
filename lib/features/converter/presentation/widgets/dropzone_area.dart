@@ -80,10 +80,10 @@ class DropzoneArea extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 64, horizontal: 24),
           decoration: BoxDecoration(
-            color: AppTheme.surfaceContainerLow,
+            color: AppTheme.surfaceContainerLow(context),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: AppTheme.primary.withValues(alpha: 0.25),
+              color: AppTheme.primary(context).withValues(alpha: 0.25),
               width: 1.5,
             ),
           ),
@@ -93,14 +93,14 @@ class DropzoneArea extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppTheme.primary.withValues(alpha: 0.05),
+                  color: AppTheme.primary(context).withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.primary.withValues(alpha: 0.15)),
+                  border: Border.all(color: AppTheme.primary(context).withValues(alpha: 0.15)),
                 ),
                 child: Icon(
                   iconData,
                   size: 44,
-                  color: AppTheme.primary,
+                  color: AppTheme.primary(context),
                 ),
               ),
               const SizedBox(height: 24),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:morph/l10n/app_localizations.dart';
+import '../../../../core/di/injection_container.dart' as di;
 import '../../../../core/theme/app_theme.dart';
+import '../../../../services/file_opener_service.dart';
 import '../../domain/entities/media_file.dart';
 
 /// A widget that displays the summary of a completed file conversion run.
@@ -38,9 +40,9 @@ class ConversionProgress extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 500),
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: AppTheme.surface,
+            color: AppTheme.surface(context),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppTheme.border),
+            border: Border.all(color: AppTheme.border(context)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -50,14 +52,14 @@ class ConversionProgress extends StatelessWidget {
                 width: 72,
                 height: 72,
                 decoration: BoxDecoration(
-                  color: AppTheme.success.withValues(alpha: 0.1),
+                  color: AppTheme.success(context).withValues(alpha: 0.1),
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppTheme.success.withValues(alpha: 0.2)),
+                  border: Border.all(color: AppTheme.success(context).withValues(alpha: 0.2)),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.check_circle_outline,
                   size: 44,
-                  color: AppTheme.success,
+                  color: AppTheme.success(context),
                 ),
               ),
               const SizedBox(height: 24),
@@ -78,48 +80,68 @@ class ConversionProgress extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppTheme.primary.withValues(alpha: 0.05),
+                    color: AppTheme.primary(context).withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppTheme.primary.withValues(alpha: 0.15)),
+                    border: Border.all(color: AppTheme.primary(context).withValues(alpha: 0.15)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.inventory_2_outlined,
-                            color: AppTheme.primaryLight,
+                            color: AppTheme.primaryLight(context),
                             size: 20,
                           ),
                           const SizedBox(width: 8),
                           Text(
                             localizations.localeName == 'es' ? 'Archivo ZIP Creado' : 'ZIP File Created',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
-                              color: AppTheme.primaryLight,
+                              color: AppTheme.primaryLight(context),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 10),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: AppTheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: SelectableText(
-                          generatedZipPath!,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: AppTheme.onSurfaceVariant,
-                            fontFamily: 'monospace',
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: AppTheme.surfaceContainerHighest(context).withValues(alpha: 0.5),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: SelectableText(
+                                generatedZipPath!,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: AppTheme.onSurfaceVariant(context),
+                                  fontFamily: 'monospace',
+                                ),
+                                maxLines: 2,
+                              ),
+                            ),
                           ),
-                          maxLines: 2,
-                        ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            icon: const Icon(Icons.open_in_new, size: 18),
+                            tooltip: localizations.localeName == 'es' ? 'Abrir ZIP' : 'Open ZIP',
+                            onPressed: () {
+                              di.sl<FileOpenerService>().openFile(generatedZipPath!);
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.folder_open_outlined, size: 18),
+                            tooltip: localizations.localeName == 'es' ? 'Mostrar en carpeta' : 'Show in folder',
+                            onPressed: () {
+                              di.sl<FileOpenerService>().openFolder(generatedZipPath!);
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -128,14 +150,14 @@ class ConversionProgress extends StatelessWidget {
               const SizedBox(height: 24),
               // Output files list
               if (successfulConversions.isNotEmpty) ...[
-                const Divider(color: AppTheme.border),
+                Divider(color: AppTheme.border(context)),
                 const SizedBox(height: 12),
                 ...successfulConversions.map((file) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6),
                     child: Row(
                       children: [
-                        const Icon(Icons.check_circle_outline, size: 14, color: AppTheme.success),
+                        Icon(Icons.check_circle_outline, size: 14, color: AppTheme.success(context)),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Column(
@@ -150,9 +172,9 @@ class ConversionProgress extends StatelessWidget {
                               if (file.outputPath != null)
                                 Text(
                                   file.outputPath!,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 10,
-                                    color: AppTheme.onSurfaceVariant,
+                                    color: AppTheme.onSurfaceVariant(context),
                                     fontFamily: 'monospace',
                                   ),
                                   maxLines: 1,
@@ -161,6 +183,28 @@ class ConversionProgress extends StatelessWidget {
                             ],
                           ),
                         ),
+                        if (file.outputPath != null) ...[
+                          const SizedBox(width: 8),
+                          IconButton(
+                            icon: const Icon(Icons.open_in_new, size: 16),
+                            tooltip: localizations.localeName == 'es' ? 'Abrir archivo' : 'Open file',
+                            onPressed: () {
+                              di.sl<FileOpenerService>().openFile(file.outputPath!);
+                            },
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            icon: const Icon(Icons.folder_open_outlined, size: 16),
+                            tooltip: localizations.localeName == 'es' ? 'Mostrar en carpeta' : 'Show in folder',
+                            onPressed: () {
+                              di.sl<FileOpenerService>().openFolder(file.outputPath!);
+                            },
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
                       ],
                     ),
                   );
@@ -169,7 +213,7 @@ class ConversionProgress extends StatelessWidget {
               ],
               // Failed files list
               if (failedConversions.isNotEmpty) ...[
-                const Divider(color: AppTheme.border),
+                Divider(color: AppTheme.border(context)),
                 const SizedBox(height: 12),
                 ...failedConversions.map((file) {
                   return Padding(
@@ -177,7 +221,7 @@ class ConversionProgress extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.error_outline, size: 14, color: AppTheme.error),
+                        Icon(Icons.error_outline, size: 14, color: AppTheme.error(context)),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Column(
@@ -192,9 +236,9 @@ class ConversionProgress extends StatelessWidget {
                               if (file.errorMessage != null)
                                 Text(
                                   file.errorMessage!,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 10,
-                                    color: AppTheme.error,
+                                    color: AppTheme.error(context),
                                   ),
                                   maxLines: 15,
                                   overflow: TextOverflow.ellipsis,
@@ -208,7 +252,7 @@ class ConversionProgress extends StatelessWidget {
                 }),
                 const SizedBox(height: 12),
               ],
-              const Divider(color: AppTheme.border),
+              Divider(color: AppTheme.border(context)),
               const SizedBox(height: 24),
               // Reset Button
               SizedBox(
@@ -217,7 +261,7 @@ class ConversionProgress extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: onReset,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primary,
+                    backgroundColor: AppTheme.primary(context),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),

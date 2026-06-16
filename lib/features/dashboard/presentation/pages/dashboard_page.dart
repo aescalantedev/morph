@@ -60,7 +60,7 @@ class DashboardPage extends StatelessWidget {
                         localizations.dashboardSubtitle,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               fontFamily: 'Inter',
-                              color: AppTheme.onSurfaceVariant,
+                              color: AppTheme.onSurfaceVariant(context),
                             ),
                       ),
                       const SizedBox(height: 20),

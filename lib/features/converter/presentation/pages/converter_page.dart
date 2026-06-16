@@ -32,9 +32,9 @@ class ConverterPage extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 450),
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: AppTheme.background,
+        color: AppTheme.background(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.border(context)),
       ),
       child: Row(
         children: tools.map((tool) {
@@ -52,10 +52,10 @@ class ConverterPage extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppTheme.primary.withValues(alpha: 0.08) : Colors.transparent,
+                    color: isSelected ? AppTheme.primary(context).withValues(alpha: 0.08) : Colors.transparent,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: isSelected ? AppTheme.primary.withValues(alpha: 0.2) : Colors.transparent,
+                      color: isSelected ? AppTheme.primary(context).withValues(alpha: 0.2) : Colors.transparent,
                     ),
                   ),
                   child: Row(
@@ -64,13 +64,13 @@ class ConverterPage extends StatelessWidget {
                       Icon(
                         tool['icon'] as IconData,
                         size: 16,
-                        color: isSelected ? AppTheme.primaryLight : const Color(0xFFA1A1AA),
+                        color: isSelected ? AppTheme.primaryLight(context) : const Color(0xFFA1A1AA),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         tool['name'] as String,
                         style: TextStyle(
-                          color: isSelected ? AppTheme.primaryLight : const Color(0xFFA1A1AA),
+                          color: isSelected ? AppTheme.primaryLight(context) : const Color(0xFFA1A1AA),
                           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                           fontSize: 13,
                         ),

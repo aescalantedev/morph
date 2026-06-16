@@ -63,16 +63,16 @@ class SettingsPanel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppTheme.background,
+        color: AppTheme.background(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.border(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.settings_outlined, size: 20, color: AppTheme.primaryLight),
+              Icon(Icons.settings_outlined, size: 20, color: AppTheme.primaryLight(context)),
               const SizedBox(width: 8),
               Text(
                 localizations.globalSettings,
@@ -99,17 +99,17 @@ class SettingsPanel extends StatelessWidget {
               return ChoiceChip(
                 label: Text(format.toUpperCase()),
                 selected: isSelected,
-                selectedColor: AppTheme.primary.withValues(alpha: 0.15),
-                backgroundColor: AppTheme.surface,
+                selectedColor: AppTheme.primary(context).withValues(alpha: 0.15),
+                backgroundColor: AppTheme.surface(context),
                 labelStyle: TextStyle(
-                  color: isSelected ? AppTheme.primaryLight : const Color(0xFFA1A1AA),
+                  color: isSelected ? AppTheme.primaryLight(context) : const Color(0xFFA1A1AA),
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   fontSize: 12,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                   side: BorderSide(
-                    color: isSelected ? AppTheme.primary.withValues(alpha: 0.5) : AppTheme.border,
+                    color: isSelected ? AppTheme.primary(context).withValues(alpha: 0.5) : AppTheme.border(context),
                   ),
                 ),
                 onSelected: isConverting
@@ -137,16 +137,16 @@ class SettingsPanel extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
-                    color: AppTheme.surfaceContainerLow,
+                    color: AppTheme.surfaceContainerLow(context),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppTheme.border),
+                    border: Border.all(color: AppTheme.border(context)),
                   ),
                   child: Text(
                     savePath.isEmpty ? '/' : savePath,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontFamily: 'monospace',
-                      color: AppTheme.onSurfaceVariant,
+                      color: AppTheme.onSurfaceVariant(context),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -159,10 +159,10 @@ class SettingsPanel extends StatelessWidget {
                 icon: const Icon(Icons.folder_open_outlined, size: 16),
                 label: Text(localizations.browse, style: const TextStyle(fontSize: 12)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.surfaceContainerLow,
-                  foregroundColor: AppTheme.primary,
+                  backgroundColor: AppTheme.surfaceContainerLow(context),
+                  foregroundColor: AppTheme.primary(context),
                   elevation: 0,
-                  side: const BorderSide(color: AppTheme.border),
+                  side: BorderSide(color: AppTheme.border(context)),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -184,8 +184,8 @@ class SettingsPanel extends StatelessWidget {
               ),
               Text(
                 '$quality%',
-                style: const TextStyle(
-                  color: AppTheme.primaryLight,
+                style: TextStyle(
+                  color: AppTheme.primaryLight(context),
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
@@ -195,11 +195,11 @@ class SettingsPanel extends StatelessWidget {
           const SizedBox(height: 8),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              activeTrackColor: AppTheme.primary,
-              inactiveTrackColor: AppTheme.border,
-              thumbColor: AppTheme.primary,
-              overlayColor: AppTheme.primary.withValues(alpha: 0.12),
-              valueIndicatorColor: AppTheme.primary,
+              activeTrackColor: AppTheme.primary(context),
+              inactiveTrackColor: AppTheme.border(context),
+              thumbColor: AppTheme.primary(context),
+              overlayColor: AppTheme.primary(context).withValues(alpha: 0.12),
+              valueIndicatorColor: AppTheme.primary(context),
               trackHeight: 4,
             ),
             child: Slider(
@@ -220,9 +220,9 @@ class SettingsPanel extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: AppTheme.surfaceContainerLow,
+                color: AppTheme.surfaceContainerLow(context),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppTheme.border),
+                border: Border.all(color: AppTheme.border(context)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -230,7 +230,7 @@ class SettingsPanel extends StatelessWidget {
                   Expanded(
                     child: Row(
                       children: [
-                        const Icon(Icons.archive_outlined, size: 20, color: AppTheme.primaryLight),
+                        Icon(Icons.archive_outlined, size: 20, color: AppTheme.primaryLight(context)),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
@@ -239,18 +239,18 @@ class SettingsPanel extends StatelessWidget {
                             children: [
                               Text(
                                 localizations.packageInZip,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
-                                  color: AppTheme.onSurface,
+                                  color: AppTheme.onSurface(context),
                                 ),
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 localizations.packageInZipDesc,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
-                                  color: AppTheme.onSurfaceVariant,
+                                  color: AppTheme.onSurfaceVariant(context),
                                 ),
                               ),
                             ],
@@ -266,7 +266,7 @@ class SettingsPanel extends StatelessWidget {
                         : (val) {
                             context.read<ConverterBloc>().add(ToggleShouldZipEvent(val));
                           },
-                    activeThumbColor: AppTheme.primary,
+                    activeThumbColor: AppTheme.primary(context),
                   ),
                 ],
               ),
@@ -303,13 +303,13 @@ class SettingsPanel extends StatelessWidget {
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
+                backgroundColor: AppTheme.primary(context),
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                disabledBackgroundColor: AppTheme.primary.withValues(alpha: 0.3),
+                disabledBackgroundColor: AppTheme.primary(context).withValues(alpha: 0.3),
               ),
             ),
           ),

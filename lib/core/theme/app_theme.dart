@@ -2,173 +2,244 @@ import 'package:flutter/material.dart';
 
 /// The central theme configurations for the Morph application.
 ///
-/// Implements the "Pro-Convert System" design system, an efficient, precise,
-/// and reliable corporate Material 3 light theme. Anchored by a Deep Indigo
-/// primary color and a Teal secondary color, featuring clear boundaries,
-/// systematic feedback, and structured typography.
+/// Implements standard Material 3 dynamic color scheme derivation.
 class AppTheme {
   AppTheme._();
 
-  /// Background color for layouts (Level 0: #FAF9F9).
-  static const Color background = Color(0xFFFAF9F9);
+  /// Flag indicating whether dark mode is currently active.
+  /// Kept for backward compatibility references.
+  static bool isDark = false;
+
+  // --- DYNAMIC COLOR METHODS ---
+
+  /// Layout background color.
+  static Color background(BuildContext context) => Theme.of(context).colorScheme.surface;
 
   /// Canvas background color.
-  static const Color canvas = Color(0xFFFAF9F9);
+  static Color canvas(BuildContext context) => Theme.of(context).colorScheme.surface;
 
   /// Primary surface color for standard modules.
-  static const Color surface = Color(0xFFFAF9F9);
+  static Color surface(BuildContext context) => Theme.of(context).colorScheme.surfaceContainer;
 
-  /// Tonal layer: Dimmed surface (#DADADA).
-  static const Color surfaceDim = Color(0xFFDADADA);
+  /// Tonal layer: Dimmed surface.
+  static Color surfaceDim(BuildContext context) => Theme.of(context).colorScheme.surfaceDim;
 
-  /// Tonal layer: Lowest container elevation (#FFFFFF).
-  static const Color surfaceContainerLowest = Color(0xFFFFFFFF);
+  /// Tonal layer: Lowest container elevation.
+  static Color surfaceContainerLowest(BuildContext context) => Theme.of(context).colorScheme.surfaceContainerLowest;
 
-  /// Tonal layer: Low container elevation (#F4F3F3).
-  static const Color surfaceContainerLow = Color(0xFFF4F3F3);
+  /// Tonal layer: Low container elevation.
+  static Color surfaceContainerLow(BuildContext context) => Theme.of(context).colorScheme.surfaceContainerLow;
 
-  /// Tonal layer: Standard container elevation (#EFEEED).
-  static const Color surfaceContainer = Color(0xFFEFEEED);
+  /// Tonal layer: Standard container elevation.
+  static Color surfaceContainer(BuildContext context) => Theme.of(context).colorScheme.surfaceContainer;
 
-  /// Tonal layer: High container elevation (#E9E8E8).
-  static const Color surfaceContainerHigh = Color(0xFFE9E8E8);
+  /// Tonal layer: High container elevation.
+  static Color surfaceContainerHigh(BuildContext context) => Theme.of(context).colorScheme.surfaceContainerHigh;
 
-  /// Tonal layer: Highest container elevation (#E3E2E2).
-  static const Color surfaceContainerHighest = Color(0xFFE3E2E2);
+  /// Tonal layer: Highest container elevation.
+  static Color surfaceContainerHighest(BuildContext context) => Theme.of(context).colorScheme.surfaceContainerHighest;
 
-  /// Default text color on surface (#1A1C1C).
-  static const Color onSurface = Color(0xFF1A1C1C);
+  /// Default text color on surface.
+  static Color onSurface(BuildContext context) => Theme.of(context).colorScheme.onSurface;
 
-  /// Muted text color on surface (#454652).
-  static const Color onSurfaceVariant = Color(0xFF454652);
+  /// Muted text color on surface.
+  static Color onSurfaceVariant(BuildContext context) => Theme.of(context).colorScheme.onSurfaceVariant;
 
-  /// The standard border color (outline-variant: #C5C5D4).
-  static const Color border = Color(0xFFC5C5D4);
+  /// Standard border color.
+  static Color border(BuildContext context) => Theme.of(context).colorScheme.outlineVariant;
 
-  /// The outline color for high-contrast borders (#757684).
-  static const Color outline = Color(0xFF757684);
+  /// Outline color for high-contrast borders.
+  static Color outline(BuildContext context) => Theme.of(context).colorScheme.outline;
 
-  /// The accent primary color (Deep Indigo: #24389C).
-  static const Color primary = Color(0xFF24389C);
+  /// Accent primary color.
+  static Color primary(BuildContext context) => Theme.of(context).colorScheme.primary;
 
-  /// Lighter variant of primary color, mapped to primaryContainer (#3F51B5).
-  static const Color primaryLight = Color(0xFF3F51B5);
+  /// Lighter variant of primary color.
+  static Color primaryLight(BuildContext context) => Theme.of(context).colorScheme.primaryContainer;
 
-  /// Text/icon color on primary elements (#FFFFFF).
-  static const Color onPrimary = Color(0xFFFFFFFF);
+  /// Text/icon color on primary elements.
+  static Color get onPrimary => const Color(0xFFFFFFFF);
 
-  /// The primary container color (Indigo: #3F51B5).
-  static const Color primaryContainer = Color(0xFF3F51B5);
+  /// Primary container color.
+  static Color primaryContainer(BuildContext context) => Theme.of(context).colorScheme.primaryContainer;
 
-  /// Text/icon color on primary container elements (#CACFFF).
-  static const Color onPrimaryContainer = Color(0xFFCACFFF);
+  /// Text/icon color on primary container elements.
+  static Color onPrimaryContainer(BuildContext context) => Theme.of(context).colorScheme.onPrimaryContainer;
 
-  /// The secondary color (Teal: #006876).
-  static const Color secondary = Color(0xFF006876);
+  /// Secondary color.
+  static Color secondary(BuildContext context) => Theme.of(context).colorScheme.secondary;
 
-  /// Text/icon color on secondary elements (#FFFFFF).
-  static const Color onSecondary = Color(0xFFFFFFFF);
+  /// Text/icon color on secondary elements.
+  static Color get onSecondary => const Color(0xFFFFFFFF);
 
-  /// The secondary container color (Cyan: #58E6FF).
-  static const Color secondaryContainer = Color(0xFF58E6FF);
+  /// Secondary container color.
+  static Color secondaryContainer(BuildContext context) => Theme.of(context).colorScheme.secondaryContainer;
 
-  /// Text/icon color on secondary container elements (#006573).
-  static const Color onSecondaryContainer = Color(0xFF006573);
+  /// Text/icon color on secondary container elements.
+  static Color onSecondaryContainer(BuildContext context) => Theme.of(context).colorScheme.onSecondaryContainer;
 
-  /// Color used for indicating successful operations (Teal/Secondary: #006876).
-  static const Color success = Color(0xFF006876);
+  /// Color used for indicating successful operations.
+  static Color success(BuildContext context) => Theme.of(context).colorScheme.secondary;
 
-  /// Color used for indicating failure/errors (Red: #BA1A1A).
-  static const Color error = Color(0xFFBA1A1A);
+  /// Color used for indicating failure/errors.
+  static Color error(BuildContext context) => Theme.of(context).colorScheme.error;
 
-  /// Color used for indicating warnings (Amber: #F59E0B).
-  static const Color warning = Color(0xFFF59E0B);
+  /// Color used for indicating warnings.
+  static Color get warning => const Color(0xFFF59E0B);
 
-  /// Color used for informational prompts (Cyan/Blue: #006876).
-  static const Color info = Color(0xFF3F51B5);
+  /// Color used for informational prompts.
+  static Color info(BuildContext context) => Theme.of(context).colorScheme.tertiary;
 
   /// Generates the Light ThemeData config for the application.
-  static ThemeData get lightTheme {
+  static ThemeData lightTheme(Color seedColor) {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: seedColor,
+      brightness: Brightness.light,
+    );
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: canvas,
-      colorScheme: const ColorScheme.light(
-        primary: primary,
-        onPrimary: onPrimary,
-        primaryContainer: primaryContainer,
-        onPrimaryContainer: onPrimaryContainer,
-        secondary: secondary,
-        onSecondary: onSecondary,
-        secondaryContainer: secondaryContainer,
-        onSecondaryContainer: onSecondaryContainer,
-        error: error,
-        onError: onPrimary,
-        surface: surface,
-        onSurface: onSurface,
-        outline: border,
-        shadow: Color(0x1F000000),
-      ),
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: colorScheme.surface,
       cardTheme: CardThemeData(
-        color: surfaceContainerLowest,
+        color: colorScheme.surfaceContainerLowest,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: border, width: 1),
+          side: BorderSide(color: colorScheme.outlineVariant, width: 1),
         ),
       ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: background,
+      appBarTheme: AppBarTheme(
+        backgroundColor: colorScheme.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        iconTheme: IconThemeData(color: onSurface),
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
         titleTextStyle: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: onSurface,
+          color: colorScheme.onSurface,
           fontFamily: 'Inter',
         ),
       ),
-      navigationRailTheme: const NavigationRailThemeData(
-        backgroundColor: background,
-        selectedIconTheme: IconThemeData(color: primary),
-        unselectedIconTheme: IconThemeData(color: onSurfaceVariant),
-        selectedLabelTextStyle: TextStyle(color: primary, fontWeight: FontWeight.w600, fontFamily: 'Inter'),
-        unselectedLabelTextStyle: TextStyle(color: onSurfaceVariant, fontFamily: 'Inter'),
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: colorScheme.surface,
+        selectedIconTheme: IconThemeData(color: colorScheme.primary),
+        unselectedIconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
+        selectedLabelTextStyle: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.w600, fontFamily: 'Inter'),
+        unselectedLabelTextStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Inter'),
       ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: background,
-        selectedItemColor: primary,
-        unselectedItemColor: onSurfaceVariant,
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: colorScheme.surface,
+        selectedItemColor: colorScheme.primary,
+        unselectedItemColor: colorScheme.onSurfaceVariant,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),
-      textTheme: const TextTheme(
+      textTheme: TextTheme(
         titleLarge: TextStyle(
           fontWeight: FontWeight.w600,
-          color: onSurface,
+          color: colorScheme.onSurface,
           fontSize: 22,
           fontFamily: 'Inter',
         ),
         titleMedium: TextStyle(
           fontWeight: FontWeight.w500,
-          color: onSurface,
+          color: colorScheme.onSurface,
           fontSize: 16,
           fontFamily: 'Inter',
         ),
         bodyLarge: TextStyle(
-          color: onSurface,
+          color: colorScheme.onSurface,
           fontSize: 14,
           fontFamily: 'Inter',
         ),
         bodyMedium: TextStyle(
-          color: onSurfaceVariant,
+          color: colorScheme.onSurfaceVariant,
           fontSize: 13,
           fontFamily: 'Inter',
         ),
         labelSmall: TextStyle(
-          color: outline,
+          color: colorScheme.outline,
+          fontSize: 11,
+          fontFamily: 'JetBrains Mono',
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  /// Generates the Dark ThemeData config for the application.
+  static ThemeData darkTheme(Color seedColor) {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: seedColor,
+      brightness: Brightness.dark,
+    );
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: colorScheme.surface,
+      // cardTheme: CardThemeData(
+      //   color: colorScheme.surfaceContainerLowest,
+      //   elevation: 0,
+      //   shape: RoundedRectangleBorder(
+      //     borderRadius: BorderRadius.circular(16),
+      //     side: BorderSide(color: colorScheme.outlineVariant, width: 1),
+      //   ),
+      // ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: colorScheme.surface,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
+        titleTextStyle: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: colorScheme.onSurface,
+          fontFamily: 'Inter',
+        ),
+      ),
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: colorScheme.surface,
+        selectedIconTheme: IconThemeData(color: colorScheme.primary),
+        unselectedIconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
+        selectedLabelTextStyle: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.w600, fontFamily: 'Inter'),
+        unselectedLabelTextStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Inter'),
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: colorScheme.surface,
+        selectedItemColor: colorScheme.primary,
+        unselectedItemColor: colorScheme.onSurfaceVariant,
+        type: BottomNavigationBarType.fixed,
+        elevation: 8,
+      ),
+      textTheme: TextTheme(
+        titleLarge: TextStyle(
+          fontWeight: FontWeight.w600,
+          color: colorScheme.onSurface,
+          fontSize: 22,
+          fontFamily: 'Inter',
+        ),
+        titleMedium: TextStyle(
+          fontWeight: FontWeight.w500,
+          color: colorScheme.onSurface,
+          fontSize: 16,
+          fontFamily: 'Inter',
+        ),
+        bodyLarge: TextStyle(
+          color: colorScheme.onSurface,
+          fontSize: 14,
+          fontFamily: 'Inter',
+        ),
+        bodyMedium: TextStyle(
+          color: colorScheme.onSurfaceVariant,
+          fontSize: 13,
+          fontFamily: 'Inter',
+        ),
+        labelSmall: TextStyle(
+          color: colorScheme.outline,
           fontSize: 11,
           fontFamily: 'JetBrains Mono',
           fontWeight: FontWeight.w500,

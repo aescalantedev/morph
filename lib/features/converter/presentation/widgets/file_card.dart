@@ -43,26 +43,26 @@ class FileCard extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: AppTheme.primary.withValues(alpha: 0.1),
+            color: AppTheme.primary(context).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppTheme.primary.withValues(alpha: 0.2)),
+            border: Border.all(color: AppTheme.primary(context).withValues(alpha: 0.2)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(
+              SizedBox(
                 width: 10,
                 height: 10,
                 child: CircularProgressIndicator(
                   strokeWidth: 1.5,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primary),
+                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primary(context)),
                 ),
               ),
               const SizedBox(width: 6),
               Text(
                 localizations.processing,
-                style: const TextStyle(
-                  color: AppTheme.primaryLight,
+                style: TextStyle(
+                  color: AppTheme.primaryLight(context),
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
                 ),
@@ -74,23 +74,23 @@ class FileCard extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: AppTheme.success.withValues(alpha: 0.1),
+            color: AppTheme.success(context).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppTheme.success.withValues(alpha: 0.2)),
+            border: Border.all(color: AppTheme.success(context).withValues(alpha: 0.2)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.check_circle,
                 size: 14,
-                color: AppTheme.success,
+                color: AppTheme.success(context),
               ),
               const SizedBox(width: 4),
               Text(
                 localizations.completed,
-                style: const TextStyle(
-                  color: AppTheme.success,
+                style: TextStyle(
+                  color: AppTheme.success(context),
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
                 ),
@@ -102,23 +102,23 @@ class FileCard extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: AppTheme.error.withValues(alpha: 0.1),
+            color: AppTheme.error(context).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppTheme.error.withValues(alpha: 0.2)),
+            border: Border.all(color: AppTheme.error(context).withValues(alpha: 0.2)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.error,
                 size: 14,
-                color: AppTheme.error,
+                color: AppTheme.error(context),
               ),
               const SizedBox(width: 4),
               Text(
                 localizations.failed,
-                style: const TextStyle(
-                  color: AppTheme.error,
+                style: TextStyle(
+                  color: AppTheme.error(context),
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
                 ),
@@ -155,12 +155,12 @@ class FileCard extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: AppTheme.border.withValues(alpha: 0.3),
+                    color: AppTheme.border(context).withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     fileIcon,
-                    color: AppTheme.primaryLight,
+                    color: AppTheme.primaryLight(context),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -213,8 +213,8 @@ class FileCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
                   value: file.progress,
-                  backgroundColor: AppTheme.border,
-                  valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primary),
+                  backgroundColor: AppTheme.border(context),
+                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primary(context)),
                   minHeight: 4,
                 ),
               ),

@@ -16,16 +16,16 @@ class HistoryPage extends StatelessWidget {
 
   /// Builds a status badge representing the outcome of the conversion (completed/failed).
   Widget _buildStatusBadge(BuildContext context, ConversionStatus status, AppLocalizations localizations) {
-    Color color = AppTheme.primary;
+    Color color = AppTheme.primary(context);
     String text = localizations.processing;
     IconData icon = Icons.sync;
 
     if (status == ConversionStatus.completed) {
-      color = AppTheme.success;
+      color = AppTheme.success(context);
       text = localizations.completed;
       icon = Icons.check_circle;
     } else if (status == ConversionStatus.failed) {
-      color = AppTheme.error;
+      color = AppTheme.error(context);
       text = localizations.failed;
       icon = Icons.error;
     }
@@ -71,20 +71,20 @@ class HistoryPage extends StatelessWidget {
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: AppTheme.surface.withValues(alpha: 0.5),
+                    color: AppTheme.surface(context).withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppTheme.border),
+                    border: Border.all(color: AppTheme.border(context)),
                   ),
                   child: history.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text(
                             'El historial está vacío.',
-                            style: TextStyle(color: Color(0xFF71717A), fontSize: 13),
+                            style: TextStyle(color: AppTheme.onSurfaceVariant(context), fontSize: 13),
                           ),
                         )
                       : ListView.separated(
                           itemCount: history.length,
-                          separatorBuilder: (context, index) => const Divider(color: AppTheme.border, height: 1),
+                          separatorBuilder: (context, index) => Divider(color: AppTheme.border(context), height: 1),
                           itemBuilder: (context, index) {
                             final item = history[index];
                             IconData itemIcon = Icons.insert_drive_file_outlined;
@@ -100,7 +100,7 @@ class HistoryPage extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                               child: Row(
                                 children: [
-                                  Icon(itemIcon, color: const Color(0xFFA1A1AA), size: 22),
+                                  Icon(itemIcon, color: AppTheme.onSurfaceVariant(context), size: 22),
                                   const SizedBox(width: 16),
                                   Expanded(
                                     child: Column(
@@ -108,10 +108,10 @@ class HistoryPage extends StatelessWidget {
                                       children: [
                                         Text(
                                           item.name,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w500,
-                                            color: Color(0xFFFAFAF9),
+                                            color: AppTheme.onSurface(context),
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -120,9 +120,9 @@ class HistoryPage extends StatelessWidget {
                                           const SizedBox(height: 4),
                                           Text(
                                             item.outputPath!,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 10,
-                                              color: Color(0xFF71717A),
+                                              color: AppTheme.onSurfaceVariant(context),
                                               fontFamily: 'monospace',
                                             ),
                                             maxLines: 1,
@@ -133,9 +133,9 @@ class HistoryPage extends StatelessWidget {
                                           const SizedBox(height: 4),
                                           Text(
                                             item.errorMessage!,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 10,
-                                              color: AppTheme.error,
+                                              color: AppTheme.error(context),
                                             ),
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
@@ -149,30 +149,30 @@ class HistoryPage extends StatelessWidget {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: AppTheme.canvas,
+                                      color: AppTheme.canvas(context),
                                       borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(color: AppTheme.border),
+                                      border: Border.all(color: AppTheme.border(context)),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
                                           item.extension,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 9,
                                             fontFamily: 'monospace',
-                                            color: Color(0xFFA1A1AA),
+                                            color: AppTheme.onSurfaceVariant(context),
                                           ),
                                         ),
                                         const SizedBox(width: 4),
-                                        const Icon(Icons.arrow_right_alt, size: 10, color: Color(0xFF71717A)),
+                                        Icon(Icons.arrow_right_alt, size: 10, color: AppTheme.outline(context)),
                                         const SizedBox(width: 4),
                                         Text(
                                           item.targetFormat.toUpperCase(),
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 9,
                                             fontFamily: 'monospace',
-                                            color: AppTheme.primaryLight,
+                                            color: AppTheme.primaryLight(context),
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),

@@ -4,6 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:archive/archive_io.dart';
+import '../../../../core/di/injection_container.dart' as di;
+import '../../../../services/notification_service.dart';
+import '../../../settings/presentation/bloc/settings_bloc.dart';
 import '../../domain/entities/media_file.dart';
 import '../../domain/usecases/convert_file_usecase.dart';
 import '../../domain/usecases/get_media_duration_usecase.dart';
@@ -254,6 +257,23 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
         debugPrint('Error zipping files: $e');
         zipPath = null;
       }
+    }
+
+    // Trigger desktop notification on background completion if enabled
+    try {
+      final settingsBloc = di.sl<SettingsBloc>();
+      if (settingsBloc.state.notificationsEnabled) {
+        final isSpanish = settingsBloc.state.languageCode == 'es' ||
+            (settingsBloc.state.languageCode == 'system' && Platform.localeName.startsWith('es'));
+        final title = isSpanish ? "Conversión Completada" : "Conversion Complete";
+        final body = isSpanish
+            ? "¡Todos tus archivos han sido procesados con éxito!"
+            : "All your files have been successfully processed!";
+
+        di.sl<NotificationService>().showNotification(title: title, body: body);
+      }
+    } catch (e) {
+      debugPrint('Error triggering background notification: $e');
     }
 
     emit(state.copyWith(

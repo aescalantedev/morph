@@ -126,4 +126,80 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get packageInZipDesc => 'Crea un archivo .zip único';
+
+  @override
+  String get language => 'Idioma';
+
+  @override
+  String get theme => 'Apariencia';
+
+  @override
+  String get themeLight => 'Claro';
+
+  @override
+  String get themeDark => 'Oscuro';
+
+  @override
+  String get themeSystem => 'Sistema';
+
+  @override
+  String get systemLanguage => 'Por defecto del sistema';
+
+  @override
+  String get notifications => 'Notificaciones de escritorio';
+
+  @override
+  String get notificationsDesc =>
+      'Mostrar alertas al finalizar conversiones en segundo plano';
+
+  @override
+  String get defaultOutputPath => 'Ruta de salida por defecto';
+
+  @override
+  String get systemInfo => 'Información del Sistema';
+
+  @override
+  String get engineStatus => 'Estado del motor';
+
+  @override
+  String get ffmpegActive => 'FFmpeg activo (Pro-Convert Engine)';
+
+  @override
+  String get activeCodecs => 'Códecs activos';
+
+  @override
+  String get activeCodecsDesc => 'H.264, MPEG-4, AAC, VP9, WebP, PNG, JPG, GIF';
+
+  @override
+  String get platform => 'Plataforma';
+
+  @override
+  String get morphVersion => 'Versión de Morph';
+
+  @override
+  String get freeSoftware => 'Software Libre';
+
+  @override
+  String get freeSoftwareDesc =>
+      'Herramienta gratuita sin registros ni límites de conversión';
+
+  @override
+  String get conversionCompleteTitle => 'Conversión Completada';
+
+  @override
+  String get conversionCompleteBody =>
+      '¡Todos tus archivos han sido procesados con éxito!';
+
+  @override
+  String get settingsUpdated => 'Ajustes actualizados';
+
+  @override
+  String get windowsMenu => 'Menú contextual de Windows';
+
+  @override
+  String get windowsMenuDesc =>
+      'Añadir opción \'Convertir con Morph\' al hacer clic derecho en archivos';
+
+  @override
+  String get themeColor => 'Color de tema';
 }

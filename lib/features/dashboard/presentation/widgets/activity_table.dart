@@ -23,16 +23,16 @@ class ActivityTable extends StatelessWidget {
 
   /// Builds a status badge indicating the conversion state.
   Widget _buildStatusBadge(BuildContext context, ConversionStatus status, AppLocalizations localizations) {
-    Color color = AppTheme.primary;
+    Color color = AppTheme.primary(context);
     String text = localizations.processing;
     IconData icon = Icons.sync;
 
     if (status == ConversionStatus.completed) {
-      color = AppTheme.success;
+      color = AppTheme.success(context);
       text = localizations.completed;
       icon = Icons.check_circle;
     } else if (status == ConversionStatus.failed) {
-      color = AppTheme.error;
+      color = AppTheme.error(context);
       text = localizations.failed;
       icon = Icons.error;
     }
@@ -69,9 +69,9 @@ class ActivityTable extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.surfaceContainerLowest,
+        color: AppTheme.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.border(context)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -93,15 +93,15 @@ class ActivityTable extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Inter',
-                        color: AppTheme.onSurface,
+                        color: AppTheme.onSurface(context),
                       ),
                 ),
                 TextButton(
                   onPressed: onViewAll,
                   child: Text(
                     localizations.viewAll,
-                    style: const TextStyle(
-                      color: AppTheme.primary,
+                    style: TextStyle(
+                      color: AppTheme.primary(context),
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
                       fontFamily: 'Inter',
@@ -111,15 +111,15 @@ class ActivityTable extends StatelessWidget {
               ],
             ),
           ),
-          const Divider(color: AppTheme.surfaceContainerLow, height: 1),
+          Divider(color: AppTheme.surfaceContainerLow(context), height: 1),
           if (history.isEmpty)
-            const Padding(
-              padding: EdgeInsets.only(bottom: 40, top: 40),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 40, top: 40),
               child: Center(
                 child: Text(
                   'No hay actividad reciente',
                   style: TextStyle(
-                    color: AppTheme.onSurfaceVariant,
+                    color: AppTheme.onSurfaceVariant(context),
                     fontSize: 13,
                     fontFamily: 'Inter',
                   ),
@@ -131,7 +131,7 @@ class ActivityTable extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: history.length.clamp(0, 5),
-              separatorBuilder: (context, index) => const Divider(color: AppTheme.surfaceContainerLow, height: 1),
+              separatorBuilder: (context, index) => Divider(color: AppTheme.surfaceContainerLow(context), height: 1),
               itemBuilder: (context, index) {
                 final item = history[index];
                 IconData itemIcon = Icons.insert_drive_file_outlined;
@@ -147,15 +147,15 @@ class ActivityTable extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                   child: Row(
                     children: [
-                      Icon(itemIcon, color: AppTheme.onSurfaceVariant, size: 20),
+                      Icon(itemIcon, color: AppTheme.onSurfaceVariant(context), size: 20),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Text(
                           item.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: AppTheme.onSurface,
+                            color: AppTheme.onSurface(context),
                             fontFamily: 'Inter',
                           ),
                           maxLines: 1,
@@ -167,30 +167,30 @@ class ActivityTable extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: AppTheme.surfaceContainerLow,
+                          color: AppTheme.surfaceContainerLow(context),
                           borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: AppTheme.border),
+                          border: Border.all(color: AppTheme.border(context)),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               item.extension,
-                              style: const TextStyle(
-                                fontSize: 9,
-                                fontFamily: 'JetBrains Mono',
-                                color: AppTheme.onSurfaceVariant,
-                              ),
+                              style: TextStyle(
+                                  fontSize: 9,
+                                  fontFamily: 'JetBrains Mono',
+                                  color: AppTheme.onSurfaceVariant(context),
+                                ),
                             ),
                             const SizedBox(width: 4),
-                            const Icon(Icons.arrow_right_alt, size: 10, color: AppTheme.outline),
+                            Icon(Icons.arrow_right_alt, size: 10, color: AppTheme.outline(context)),
                             const SizedBox(width: 4),
                             Text(
                               item.targetFormat.toUpperCase(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 9,
                                 fontFamily: 'JetBrains Mono',
-                                color: AppTheme.primary,
+                                color: AppTheme.primary(context),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

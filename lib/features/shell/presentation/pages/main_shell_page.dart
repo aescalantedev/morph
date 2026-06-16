@@ -31,12 +31,12 @@ class MainShellPage extends StatelessWidget {
       extended: isExtended,
       minWidth: 72,
       minExtendedWidth: 250,
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.background(context),
       selectedIndex: navigationShell.currentIndex,
       onDestinationSelected: (index) {
         navigationShell.goBranch(index);
       },
-      indicatorColor: AppTheme.primary.withValues(alpha: 0.12),
+      indicatorColor: AppTheme.primary(context).withValues(alpha: 0.12),
       leading: isExtended
           ? Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
@@ -47,7 +47,7 @@ class MainShellPage extends StatelessWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: AppTheme.primary,
+                      color: AppTheme.primary(context),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     alignment: Alignment.center,
@@ -57,13 +57,13 @@ class MainShellPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
+                  Text(
                     'morph',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: -0.5, color: AppTheme.onSurface),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: -0.5, color: AppTheme.onSurface(context)),
                   ),
-                  const Text(
+                  Text(
                     '.dev',
-                    style: TextStyle(fontSize: 20, color: AppTheme.onSurfaceVariant, fontWeight: FontWeight.w300),
+                    style: TextStyle(fontSize: 20, color: AppTheme.onSurfaceVariant(context), fontWeight: FontWeight.w300),
                   ),
                 ],
               ),
@@ -74,7 +74,7 @@ class MainShellPage extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: AppTheme.primary,
+                  color: AppTheme.primary(context),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 alignment: Alignment.center,
@@ -110,7 +110,7 @@ class MainShellPage extends StatelessWidget {
             return Row(
               children: [
                 _buildNavigationRail(context, isDesktop, localizations),
-                const VerticalDivider(thickness: 1, width: 1, color: AppTheme.border),
+                VerticalDivider(thickness: 1, width: 1, color: AppTheme.border(context)),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,9 +119,9 @@ class MainShellPage extends StatelessWidget {
                       Container(
                         height: 80,
                         padding: const EdgeInsets.symmetric(horizontal: 32),
-                        decoration: const BoxDecoration(
-                          color: AppTheme.background,
-                          border: Border(bottom: BorderSide(color: AppTheme.border)),
+                        decoration: BoxDecoration(
+                          color: AppTheme.background(context),
+                          border: Border(bottom: BorderSide(color: AppTheme.border(context))),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -149,7 +149,7 @@ class MainShellPage extends StatelessWidget {
                                 errorBuilder: (context, error, stackTrace) => Container(
                                   width: 38,
                                   height: 38,
-                                  color: AppTheme.primary,
+                                  color: AppTheme.primary(context),
                                   alignment: Alignment.center,
                                   child: const Text('U', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                                 ),
@@ -176,7 +176,7 @@ class MainShellPage extends StatelessWidget {
                       width: 24,
                       height: 24,
                       decoration: BoxDecoration(
-                        color: AppTheme.primary,
+                        color: AppTheme.primary(context),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       alignment: Alignment.center,
@@ -196,9 +196,9 @@ class MainShellPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                 ],
-                bottom: const PreferredSize(
-                  preferredSize: Size.fromHeight(1),
-                  child: Divider(color: AppTheme.border, height: 1),
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(1),
+                  child: Divider(color: AppTheme.border(context), height: 1),
                 ),
               ),
               body: navigationShell,

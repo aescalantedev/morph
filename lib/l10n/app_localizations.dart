@@ -331,6 +331,150 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Crea un archivo .zip único'**
   String get packageInZipDesc;
+
+  /// No description provided for @language.
+  ///
+  /// In es, this message translates to:
+  /// **'Idioma'**
+  String get language;
+
+  /// No description provided for @theme.
+  ///
+  /// In es, this message translates to:
+  /// **'Apariencia'**
+  String get theme;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In es, this message translates to:
+  /// **'Claro'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In es, this message translates to:
+  /// **'Oscuro'**
+  String get themeDark;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In es, this message translates to:
+  /// **'Sistema'**
+  String get themeSystem;
+
+  /// No description provided for @systemLanguage.
+  ///
+  /// In es, this message translates to:
+  /// **'Por defecto del sistema'**
+  String get systemLanguage;
+
+  /// No description provided for @notifications.
+  ///
+  /// In es, this message translates to:
+  /// **'Notificaciones de escritorio'**
+  String get notifications;
+
+  /// No description provided for @notificationsDesc.
+  ///
+  /// In es, this message translates to:
+  /// **'Mostrar alertas al finalizar conversiones en segundo plano'**
+  String get notificationsDesc;
+
+  /// No description provided for @defaultOutputPath.
+  ///
+  /// In es, this message translates to:
+  /// **'Ruta de salida por defecto'**
+  String get defaultOutputPath;
+
+  /// No description provided for @systemInfo.
+  ///
+  /// In es, this message translates to:
+  /// **'Información del Sistema'**
+  String get systemInfo;
+
+  /// No description provided for @engineStatus.
+  ///
+  /// In es, this message translates to:
+  /// **'Estado del motor'**
+  String get engineStatus;
+
+  /// No description provided for @ffmpegActive.
+  ///
+  /// In es, this message translates to:
+  /// **'FFmpeg activo (Pro-Convert Engine)'**
+  String get ffmpegActive;
+
+  /// No description provided for @activeCodecs.
+  ///
+  /// In es, this message translates to:
+  /// **'Códecs activos'**
+  String get activeCodecs;
+
+  /// No description provided for @activeCodecsDesc.
+  ///
+  /// In es, this message translates to:
+  /// **'H.264, MPEG-4, AAC, VP9, WebP, PNG, JPG, GIF'**
+  String get activeCodecsDesc;
+
+  /// No description provided for @platform.
+  ///
+  /// In es, this message translates to:
+  /// **'Plataforma'**
+  String get platform;
+
+  /// No description provided for @morphVersion.
+  ///
+  /// In es, this message translates to:
+  /// **'Versión de Morph'**
+  String get morphVersion;
+
+  /// No description provided for @freeSoftware.
+  ///
+  /// In es, this message translates to:
+  /// **'Software Libre'**
+  String get freeSoftware;
+
+  /// No description provided for @freeSoftwareDesc.
+  ///
+  /// In es, this message translates to:
+  /// **'Herramienta gratuita sin registros ni límites de conversión'**
+  String get freeSoftwareDesc;
+
+  /// No description provided for @conversionCompleteTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Conversión Completada'**
+  String get conversionCompleteTitle;
+
+  /// No description provided for @conversionCompleteBody.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Todos tus archivos han sido procesados con éxito!'**
+  String get conversionCompleteBody;
+
+  /// No description provided for @settingsUpdated.
+  ///
+  /// In es, this message translates to:
+  /// **'Ajustes actualizados'**
+  String get settingsUpdated;
+
+  /// No description provided for @windowsMenu.
+  ///
+  /// In es, this message translates to:
+  /// **'Menú contextual de Windows'**
+  String get windowsMenu;
+
+  /// No description provided for @windowsMenuDesc.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir opción \'Convertir con Morph\' al hacer clic derecho en archivos'**
+  String get windowsMenuDesc;
+
+  /// No description provided for @themeColor.
+  ///
+  /// In es, this message translates to:
+  /// **'Color de tema'**
+  String get themeColor;
 }
 
 class _AppLocalizationsDelegate
