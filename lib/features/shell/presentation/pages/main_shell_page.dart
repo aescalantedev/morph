@@ -1,7 +1,10 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:morph/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../widgets/custom_title_bar.dart';
 
 /// The primary shell page that provides a responsive layout for the application.
 ///
@@ -97,14 +100,15 @@ class MainShellPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
+    final isDesktopPlatform = !kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux);
 
-    return Scaffold(
+    final Widget shellContent = Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isTabletOrDesktop = constraints.maxWidth >= 640;
 
           if (isTabletOrDesktop) {
-            final isDesktop = constraints.maxWidth >= 1024;
+            final isDesktop = constraints.maxWidth >= 1150;
 
             // Desktop & Tablet NavigationRail Layout
             return Row(
@@ -231,5 +235,18 @@ class MainShellPage extends StatelessWidget {
         },
       ),
     );
+
+    if (isDesktopPlatform) {
+      return Scaffold(
+        body: Column(
+          children: [
+            const CustomTitleBar(),
+            Expanded(child: shellContent),
+          ],
+        ),
+      );
+    }
+
+    return shellContent;
   }
 }

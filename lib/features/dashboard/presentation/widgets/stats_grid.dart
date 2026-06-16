@@ -91,31 +91,34 @@ class StatsGrid extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          value,
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 22,
-                                fontFamily: 'JetBrains Mono',
-                                color: AppTheme.onSurface(context),
-                              ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          subtitle,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontSize: 10,
-                                color: AppTheme.onSurfaceVariant(context),
-                                fontFamily: 'Inter',
-                              ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            value,
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 22,
+                                  fontFamily: 'JetBrains Mono',
+                                  color: AppTheme.onSurface(context),
+                                ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            subtitle,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontSize: 10,
+                                  color: AppTheme.onSurfaceVariant(context),
+                                  fontFamily: 'Inter',
+                                ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     // Mini Sparkline
                     SizedBox(
                       width: 70,
@@ -159,7 +162,7 @@ class StatsGrid extends StatelessWidget {
 
         // Dynamically calculate columns based on available width
         final int columns;
-        if (width >= 720) {
+        if (width >= 880) {
           columns = 4;
         } else if (width >= 480) {
           columns = 2;

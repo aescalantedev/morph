@@ -2,8 +2,10 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:morph/l10n/app_localizations.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'core/di/injection_container.dart' as di;
 import 'core/navigation/app_router.dart';
@@ -28,6 +30,24 @@ void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.initDI();
   await di.sl<NotificationService>().initialize();
+
+  // Initialize window manager for desktop platforms to hide native title bar
+  final isDesktop = !kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux);
+  if (isDesktop) {
+    await windowManager.ensureInitialized();
+    const windowOptions = WindowOptions(
+      size: Size(1100, 750),
+      minimumSize: Size(850, 600),
+      center: true,
+      backgroundColor: Colors.transparent,
+      skipTaskbar: false,
+      titleBarStyle: TitleBarStyle.hidden,
+    );
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  }
 
   // Handle file argument if opened via Windows right-click context menu
   if (args.isNotEmpty) {
