@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:desktop_drop/desktop_drop.dart';
+import 'file_picker_helper.dart';
 import 'package:morph/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/media_file.dart';
@@ -30,45 +30,10 @@ class _DropzoneAreaState extends State<DropzoneArea> {
 
   /// Opens the native platform file picker filtered by [widget.activeTool].
   Future<void> _pickFiles(BuildContext context) async {
-    FileType pickerType = FileType.any;
-
-    if (widget.activeTool == 'image') {
-      pickerType = FileType.image;
-    } else if (widget.activeTool == 'video') {
-      pickerType = FileType.video;
-    } else if (widget.activeTool == 'audio') {
-      pickerType = FileType.audio;
-    }
-
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        type: pickerType,
-        allowMultiple: true,
-      );
-
-      if (result != null && result.files.isNotEmpty) {
-        final List<MediaFile> selectedFiles = [];
-        for (var file in result.files) {
-          if (file.path != null) {
-            final fileName = file.name;
-            final fileExt = file.extension ?? fileName.split('.').last;
-
-            selectedFiles.add(MediaFile(
-              id: '${DateTime.now().microsecondsSinceEpoch}_${file.path!}',
-              name: fileName,
-              path: file.path!,
-              sizeBytes: file.size,
-              extension: fileExt.toUpperCase(),
-              category: widget.activeTool,
-              targetFormat: '',
-            ));
-          }
-        }
-        if (context.mounted) {
-          context.read<ConverterBloc>().add(AddFilesEvent(selectedFiles));
-        }
-      }
-    } catch (_) {}
+    await FilePickerHelper.pickFiles(
+      context: context,
+      activeTool: widget.activeTool,
+    );
   }
 
   /// Handles files dropped into the area from the OS.

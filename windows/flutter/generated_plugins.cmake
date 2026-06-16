@@ -7,6 +7,8 @@ list(APPEND FLUTTER_PLUGIN_LIST
   ffmpeg_kit_flutter_new_full
   local_notifier
   screen_retriever_windows
+  share_plus
+  url_launcher_windows
   window_manager
 )
 

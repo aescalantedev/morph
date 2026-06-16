@@ -155,3 +155,27 @@ class ClearHistoryEvent extends ConverterEvent {
   /// Creates a [ClearHistoryEvent].
   const ClearHistoryEvent();
 }
+
+/// Event dispatched to toggle keeping original files after conversion.
+class ToggleKeepOriginalFilesEvent extends ConverterEvent {
+  /// Whether original files should be kept.
+  final bool keep;
+
+  /// Creates a [ToggleKeepOriginalFilesEvent].
+  const ToggleKeepOriginalFilesEvent(this.keep);
+
+  @override
+  List<Object?> get props => [keep];
+}
+
+/// Event dispatched to toggle merging outputs into a single file.
+class ToggleMergeIntoSingleFileEvent extends ConverterEvent {
+  /// Whether outputs should be merged.
+  final bool merge;
+
+  /// Creates a [ToggleMergeIntoSingleFileEvent].
+  const ToggleMergeIntoSingleFileEvent(this.merge);
+
+  @override
+  List<Object?> get props => [merge];
+}

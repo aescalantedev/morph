@@ -10,6 +10,7 @@ import '../widgets/dropzone_area.dart';
 import '../widgets/file_card.dart';
 import '../widgets/settings_panel.dart';
 import '../widgets/conversion_progress.dart';
+import '../widgets/file_picker_helper.dart';
 
 /// The page containing the media converter queue, format settings, and dropzone.
 ///
@@ -86,6 +87,48 @@ class ConverterPage extends StatelessWidget {
     );
   }
 
+  Widget _buildAddMoreButton(BuildContext context, String activeTool, AppLocalizations localizations) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => FilePickerHelper.pickFiles(context: context, activeTool: activeTool),
+        child: Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: AppTheme.primary(context).withValues(alpha: 0.25),
+              style: BorderStyle.solid,
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.add,
+                size: 18,
+                color: AppTheme.primary(context),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                localizations.addMoreFiles,
+                style: TextStyle(
+                  color: AppTheme.primary(context),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
@@ -103,6 +146,7 @@ class ConverterPage extends StatelessWidget {
             child: ConversionProgress(
               queue: state.queue,
               generatedZipPath: state.generatedZipPath,
+              mergeIntoSingleFile: state.mergeIntoSingleFile,
               onReset: () {
                 context.read<ConverterBloc>().add(ResetConverterEvent());
               },
@@ -116,20 +160,27 @@ class ConverterPage extends StatelessWidget {
 
             final Widget activeWidget = state.queue.isEmpty
                 ? DropzoneArea(activeTool: state.activeTool)
-                : ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: state.queue.length,
-                    itemBuilder: (context, index) {
-                      final file = state.queue[index];
-                      return FileCard(
-                        file: file,
-                        isConverting: state.isConverting,
-                        onRemove: () {
-                          context.read<ConverterBloc>().add(RemoveFileEvent(file.id));
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: state.queue.length,
+                        itemBuilder: (context, index) {
+                          final file = state.queue[index];
+                          return FileCard(
+                            file: file,
+                            isConverting: state.isConverting,
+                            onRemove: () {
+                              context.read<ConverterBloc>().add(RemoveFileEvent(file.id));
+                            },
+                          );
                         },
-                      );
-                    },
+                      ),
+                      if (!state.isConverting)
+                        _buildAddMoreButton(context, state.activeTool, localizations),
+                    ],
                   );
 
             if (isDesktop) {
@@ -170,27 +221,82 @@ class ConverterPage extends StatelessWidget {
               );
             } else {
               // Mobile/Tablet stacked layout
-              return SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    _buildToolTabs(context, state.activeTool, state.isConverting, localizations),
-                    const SizedBox(height: 24),
-                    activeWidget,
-                    if (state.queue.isNotEmpty) ...[
+              return Scaffold(
+                backgroundColor: Colors.transparent,
+                body: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      _buildToolTabs(context, state.activeTool, state.isConverting, localizations),
                       const SizedBox(height: 24),
-                      SettingsPanel(
-                        activeTool: state.activeTool,
-                        targetFormat: state.targetFormat,
-                        quality: state.quality,
-                        savePath: state.savePath,
-                        isConverting: state.isConverting,
-                        queueLength: state.queue.length,
-                        shouldZip: state.shouldZip,
-                      ),
+                      activeWidget,
+                      if (state.queue.isNotEmpty) ...[
+                        const SizedBox(height: 24),
+                        SettingsPanel(
+                          activeTool: state.activeTool,
+                          targetFormat: state.targetFormat,
+                          quality: state.quality,
+                          savePath: state.savePath,
+                          isConverting: state.isConverting,
+                          queueLength: state.queue.length,
+                          shouldZip: state.shouldZip,
+                          showConvertButton: false,
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
+                bottomNavigationBar: state.queue.isNotEmpty && !showSuccessScreen
+                    ? Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surface(context),
+                          border: Border(
+                            top: BorderSide(color: AppTheme.border(context)),
+                          ),
+                        ),
+                        child: SafeArea(
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: ElevatedButton.icon(
+                              onPressed: state.isConverting
+                                  ? null
+                                  : () {
+                                      context.read<ConverterBloc>().add(StartConversionEvent());
+                                    },
+                              icon: state.isConverting
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      ),
+                                    )
+                                  : const Icon(Icons.flash_on, size: 18),
+                              label: Text(
+                                state.isConverting
+                                    ? localizations.processing
+                                    : '${localizations.convertAll} (${state.queue.length})',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.primary(context),
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    : null,
               );
             }
           },

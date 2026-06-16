@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:file_picker/file_picker.dart';
@@ -6,6 +8,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../bloc/converter_bloc.dart';
 import '../bloc/converter_event.dart';
+import '../bloc/converter_state.dart';
 
 /// A panel containing configuration controls for target formats, compression quality, and folders.
 ///
@@ -32,6 +35,9 @@ class SettingsPanel extends StatelessWidget {
   /// Signals whether multiple converted files should be bundled into a ZIP file.
   final bool shouldZip;
 
+  /// Signals whether to show the primary convert button.
+  final bool showConvertButton;
+
   /// Creates a [SettingsPanel] widget.
   const SettingsPanel({
     super.key,
@@ -42,6 +48,7 @@ class SettingsPanel extends StatelessWidget {
     required this.isConverting,
     required this.queueLength,
     required this.shouldZip,
+    this.showConvertButton = true,
   });
 
   /// Opens the native directory chooser to select output folders.
@@ -59,6 +66,7 @@ class SettingsPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final formats = AppConstants.formatsByCategory[activeTool] ?? [];
+    final isAndroid = !kIsWeb && Platform.isAndroid;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -123,54 +131,57 @@ class SettingsPanel extends StatelessWidget {
             }).toList(),
           ),
           const SizedBox(height: 28),
-          // Save location input
-          Text(
-            localizations.saveLocation,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: AppTheme.surfaceContainerLow(context),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppTheme.border(context)),
+          if (!isAndroid) ...[
+            const SizedBox(height: 28),
+            // Save location input
+            Text(
+              localizations.saveLocation,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w500,
                   ),
-                  child: Text(
-                    savePath.isEmpty ? '/' : savePath,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'monospace',
-                      color: AppTheme.onSurfaceVariant(context),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceContainerLow(context),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppTheme.border(context)),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    child: Text(
+                      savePath.isEmpty ? '/' : savePath,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontFamily: 'monospace',
+                        color: AppTheme.onSurfaceVariant(context),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              ElevatedButton.icon(
-                onPressed: isConverting ? null : () => _selectDirectory(context),
-                icon: const Icon(Icons.folder_open_outlined, size: 16),
-                label: Text(localizations.browse, style: const TextStyle(fontSize: 12)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.surfaceContainerLow(context),
-                  foregroundColor: AppTheme.primary(context),
-                  elevation: 0,
-                  side: BorderSide(color: AppTheme.border(context)),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                const SizedBox(width: 8),
+                ElevatedButton.icon(
+                  onPressed: isConverting ? null : () => _selectDirectory(context),
+                  icon: const Icon(Icons.folder_open_outlined, size: 16),
+                  label: Text(localizations.browse, style: const TextStyle(fontSize: 12)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.surfaceContainerLow(context),
+                    foregroundColor: AppTheme.primary(context),
+                    elevation: 0,
+                    side: BorderSide(color: AppTheme.border(context)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
           const SizedBox(height: 28),
           // Quality / Compression slider
           Row(
@@ -215,7 +226,7 @@ class SettingsPanel extends StatelessWidget {
             ),
           ),
           // Zip toggle
-          if (queueLength > 1) ...[
+          if (showConvertButton && queueLength > 1) ...[
             const SizedBox(height: 24),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -272,47 +283,120 @@ class SettingsPanel extends StatelessWidget {
               ),
             ),
           ],
-          const SizedBox(height: 36),
-          // Action Button
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton.icon(
-              onPressed: isConverting || queueLength == 0
-                  ? null
-                  : () {
-                      context.read<ConverterBloc>().add(StartConversionEvent());
+          // Collapsible Advanced Settings
+          if (queueLength > 0) ...[
+            const SizedBox(height: 16),
+            Theme(
+              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                title: Text(
+                  localizations.advancedSettings,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.onSurface(context),
+                  ),
+                ),
+                leading: Icon(Icons.tune, size: 18, color: AppTheme.primaryLight(context)),
+                childrenPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                tilePadding: EdgeInsets.zero,
+                children: [
+                  // Keep original files switch
+                  BlocBuilder<ConverterBloc, ConverterState>(
+                    builder: (context, state) {
+                      return SwitchListTile(
+                        title: Text(
+                          localizations.keepOriginalFiles,
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                        ),
+                        subtitle: Text(
+                          localizations.localeName == 'es' 
+                            ? 'No eliminar los archivos de origen tras convertirlos'
+                            : "Do not delete source files after conversion",
+                          style: TextStyle(fontSize: 10, color: AppTheme.onSurfaceVariant(context)),
+                        ),
+                        contentPadding: EdgeInsets.zero,
+                        value: state.keepOriginalFiles,
+                        onChanged: isConverting
+                            ? null
+                            : (val) {
+                                context.read<ConverterBloc>().add(ToggleKeepOriginalFilesEvent(val));
+                              },
+                        activeThumbColor: AppTheme.primary(context),
+                      );
                     },
-              icon: isConverting
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                  : const Icon(Icons.flash_on, size: 18),
-              label: Text(
-                isConverting
-                    ? localizations.processing
-                    : '${localizations.convertAll} ($queueLength)',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary(context),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                disabledBackgroundColor: AppTheme.primary(context).withValues(alpha: 0.3),
+                  ),
+                  // Merge into single file switch
+                  if (activeTool == 'image' && targetFormat.toLowerCase() == 'pdf' && queueLength > 1)
+                    BlocBuilder<ConverterBloc, ConverterState>(
+                      builder: (context, state) {
+                        return SwitchListTile(
+                          title: Text(
+                            localizations.mergeIntoSingleFile,
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                          ),
+                          subtitle: Text(
+                            localizations.mergeIntoSingleFileDesc,
+                            style: TextStyle(fontSize: 10, color: AppTheme.onSurfaceVariant(context)),
+                          ),
+                          contentPadding: EdgeInsets.zero,
+                          value: state.mergeIntoSingleFile,
+                          onChanged: isConverting
+                              ? null
+                              : (val) {
+                                  context.read<ConverterBloc>().add(ToggleMergeIntoSingleFileEvent(val));
+                                },
+                          activeThumbColor: AppTheme.primary(context),
+                        );
+                      },
+                    ),
+                ],
               ),
             ),
-          ),
+          ],
+          // Action Button
+          if (showConvertButton) ...[
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton.icon(
+                onPressed: isConverting || queueLength == 0
+                    ? null
+                    : () {
+                        context.read<ConverterBloc>().add(StartConversionEvent());
+                      },
+                icon: isConverting
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Icon(Icons.flash_on, size: 18),
+                label: Text(
+                  isConverting
+                      ? localizations.processing
+                      : '${localizations.convertAll} ($queueLength)',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primary(context),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  disabledBackgroundColor: AppTheme.primary(context).withValues(alpha: 0.3),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

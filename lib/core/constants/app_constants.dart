@@ -5,7 +5,7 @@ class AppConstants {
   AppConstants._();
 
   /// Supported destination format extensions for images.
-  static const List<String> imageFormats = ['webp', 'png', 'jpg', 'avif'];
+  static const List<String> imageFormats = ['webp', 'png', 'jpg', 'avif', 'pdf'];
 
   /// Supported destination format extensions for videos.
   static const List<String> videoFormats = ['mp4', 'webm', 'gif'];

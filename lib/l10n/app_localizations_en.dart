@@ -207,4 +207,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get historyEmpty => 'The history is empty.';
+
+  @override
+  String get addMoreFiles => 'Add more files';
+
+  @override
+  String get advancedSettings => 'Advanced Settings';
+
+  @override
+  String get keepOriginalFiles => 'Keep original files';
+
+  @override
+  String get mergeIntoSingleFile => 'Merge into single PDF';
+
+  @override
+  String get mergeIntoSingleFileDesc =>
+      'Combines all selected images into a single multi-page PDF document.';
+
+  @override
+  String get share => 'Share';
+
+  @override
+  String get openFolder => 'Open folder';
+
+  @override
+  String get viewFile => 'View file';
+
+  @override
+  String get conversionComplete => 'Conversion completed';
 }

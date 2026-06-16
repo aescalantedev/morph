@@ -30,11 +30,17 @@ class ConverterState extends Equatable {
   /// Signals if settings and folders have been initialized.
   final bool isInitialized;
 
-  /// Signals whether multiple converted files should be bundled into a ZIP file.
+  /// Signals whether to bundle output files into a ZIP archive.
   final bool shouldZip;
 
-  /// The path to the generated ZIP archive, if any.
+  /// Path to the generated ZIP archive, if any.
   final String? generatedZipPath;
+
+  /// Signals whether the original source files should be kept after conversion.
+  final bool keepOriginalFiles;
+
+  /// Signals whether multiple converted files should be merged into a single file (like PDF).
+  final bool mergeIntoSingleFile;
 
   /// Creates a [ConverterState] configuration.
   const ConverterState({
@@ -48,6 +54,8 @@ class ConverterState extends Equatable {
     this.isInitialized = false,
     this.shouldZip = false,
     this.generatedZipPath,
+    this.keepOriginalFiles = true,
+    this.mergeIntoSingleFile = false,
   });
 
   /// Factory for the initial state of the conversion queue.
@@ -63,6 +71,8 @@ class ConverterState extends Equatable {
       isInitialized: false,
       shouldZip: false,
       generatedZipPath: null,
+      keepOriginalFiles: true,
+      mergeIntoSingleFile: false,
     );
   }
 
@@ -78,6 +88,8 @@ class ConverterState extends Equatable {
     bool? isInitialized,
     bool? shouldZip,
     String? generatedZipPath,
+    bool? keepOriginalFiles,
+    bool? mergeIntoSingleFile,
   }) {
     return ConverterState(
       queue: queue ?? this.queue,
@@ -90,6 +102,8 @@ class ConverterState extends Equatable {
       isInitialized: isInitialized ?? this.isInitialized,
       shouldZip: shouldZip ?? this.shouldZip,
       generatedZipPath: generatedZipPath ?? this.generatedZipPath,
+      keepOriginalFiles: keepOriginalFiles ?? this.keepOriginalFiles,
+      mergeIntoSingleFile: mergeIntoSingleFile ?? this.mergeIntoSingleFile,
     );
   }
 
@@ -105,5 +119,7 @@ class ConverterState extends Equatable {
         isInitialized,
         shouldZip,
         generatedZipPath,
+        keepOriginalFiles,
+        mergeIntoSingleFile,
       ];
 }

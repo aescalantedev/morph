@@ -208,4 +208,32 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get historyEmpty => 'El historial está vacío.';
+
+  @override
+  String get addMoreFiles => 'Añadir más archivos';
+
+  @override
+  String get advancedSettings => 'Ajustes Avanzados';
+
+  @override
+  String get keepOriginalFiles => 'Mantener archivos originales';
+
+  @override
+  String get mergeIntoSingleFile => 'Unir en un único PDF';
+
+  @override
+  String get mergeIntoSingleFileDesc =>
+      'Combina todas las imágenes seleccionadas en un único PDF de varias páginas.';
+
+  @override
+  String get share => 'Compartir';
+
+  @override
+  String get openFolder => 'Abrir carpeta';
+
+  @override
+  String get viewFile => 'Ver archivo';
+
+  @override
+  String get conversionComplete => 'Conversión completada';
 }

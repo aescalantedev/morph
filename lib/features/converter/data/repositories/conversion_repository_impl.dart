@@ -33,7 +33,7 @@ class ConversionRepositoryImpl implements ConversionRepository {
     final targetFormat = file.targetFormat.toLowerCase();
 
     // Pure Dart 'image' package handles these formats directly
-    const dartSupportedImageFormats = {'webp', 'png', 'jpg', 'jpeg', 'gif'};
+    const dartSupportedImageFormats = {'png', 'jpg', 'jpeg', 'gif', 'pdf'};
 
     if (file.category == 'image' && dartSupportedImageFormats.contains(targetFormat)) {
       return imageService.convertImage(

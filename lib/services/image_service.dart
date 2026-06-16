@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 import 'package:image/image.dart' as img;
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 /// Service to perform high-performance image conversions in a secondary isolate.
 ///
@@ -73,11 +75,28 @@ class ImageService {
         case 'jpeg':
           encodedBytes = img.encodeJpg(image, quality: quality);
           break;
-        case 'webp':
-          encodedBytes = img.encodeWebP(image);
-          break;
         case 'gif':
           encodedBytes = img.encodeGif(image);
+          break;
+        case 'pdf':
+          final pdfDoc = pw.Document();
+          final pngBytes = img.encodePng(image);
+          pdfDoc.addPage(
+            pw.Page(
+              pageFormat: PdfPageFormat(
+                image.width.toDouble(),
+                image.height.toDouble(),
+                marginAll: 0,
+              ),
+              build: (pw.Context context) {
+                return pw.Image(
+                  pw.MemoryImage(pngBytes),
+                  fit: pw.BoxFit.fill,
+                );
+              },
+            ),
+          );
+          encodedBytes = await pdfDoc.save();
           break;
         default:
           throw Exception('Unsupported image format: $targetFormat');

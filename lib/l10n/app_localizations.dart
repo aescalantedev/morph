@@ -487,6 +487,60 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'El historial está vacío.'**
   String get historyEmpty;
+
+  /// No description provided for @addMoreFiles.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir más archivos'**
+  String get addMoreFiles;
+
+  /// No description provided for @advancedSettings.
+  ///
+  /// In es, this message translates to:
+  /// **'Ajustes Avanzados'**
+  String get advancedSettings;
+
+  /// No description provided for @keepOriginalFiles.
+  ///
+  /// In es, this message translates to:
+  /// **'Mantener archivos originales'**
+  String get keepOriginalFiles;
+
+  /// No description provided for @mergeIntoSingleFile.
+  ///
+  /// In es, this message translates to:
+  /// **'Unir en un único PDF'**
+  String get mergeIntoSingleFile;
+
+  /// No description provided for @mergeIntoSingleFileDesc.
+  ///
+  /// In es, this message translates to:
+  /// **'Combina todas las imágenes seleccionadas en un único PDF de varias páginas.'**
+  String get mergeIntoSingleFileDesc;
+
+  /// No description provided for @share.
+  ///
+  /// In es, this message translates to:
+  /// **'Compartir'**
+  String get share;
+
+  /// No description provided for @openFolder.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir carpeta'**
+  String get openFolder;
+
+  /// No description provided for @viewFile.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver archivo'**
+  String get viewFile;
+
+  /// No description provided for @conversionComplete.
+  ///
+  /// In es, this message translates to:
+  /// **'Conversión completada'**
+  String get conversionComplete;
 }
 
 class _AppLocalizationsDelegate

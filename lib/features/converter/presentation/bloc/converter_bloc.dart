@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
@@ -8,6 +10,9 @@ import '../../../../core/di/injection_container.dart' as di;
 import '../../../../services/notification_service.dart';
 import '../../../../services/history_storage_service.dart';
 import '../../../settings/presentation/bloc/settings_bloc.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:image/image.dart' as img;
 import '../../domain/entities/media_file.dart';
 import '../../domain/usecases/convert_file_usecase.dart';
 import '../../domain/usecases/get_media_duration_usecase.dart';
@@ -49,6 +54,8 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
     on<ToggleShouldZipEvent>(_onToggleShouldZip);
     on<LoadHistoryEvent>(_onLoadHistory);
     on<ClearHistoryEvent>(_onClearHistory);
+    on<ToggleKeepOriginalFilesEvent>(_onToggleKeepOriginalFiles);
+    on<ToggleMergeIntoSingleFileEvent>(_onToggleMergeIntoSingleFile);
 
     _initializeDefaultSavePath();
   }
@@ -177,15 +184,136 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
     List<MediaFile> updatedHistory = List<MediaFile>.from(state.history);
     if (event.status == ConversionStatus.completed || event.status == ConversionStatus.failed) {
       updatedHistory = List<MediaFile>.from(state.history)..insert(0, updatedFile);
-      await historyStorage.writeHistory(updatedHistory);
     }
 
+    // Emit synchronously so that sequential events get the latest state immediately
     emit(state.copyWith(queue: updatedQueue, history: updatedHistory));
+
+    // Persist to storage asynchronously after emitting state
+    if (event.status == ConversionStatus.completed || event.status == ConversionStatus.failed) {
+      try {
+        await historyStorage.writeHistory(updatedHistory);
+      } catch (_) {}
+    }
   }
 
   /// Event handler that initiates the sequential conversion pipeline of queued files.
   Future<void> _onStartConversion(StartConversionEvent event, Emitter<ConverterState> emit) async {
     if (state.isConverting || state.queue.isEmpty) return;
+
+    final targetFormat = state.targetFormat.toLowerCase();
+
+    // PDF merging routine
+    if (state.mergeIntoSingleFile && targetFormat == 'pdf' && state.activeTool == 'image') {
+      emit(state.copyWith(isConverting: true, generatedZipPath: null));
+
+      final outputFileName = 'merged_document_${DateTime.now().millisecondsSinceEpoch}.pdf';
+      final outputPath = '${state.savePath}${Platform.pathSeparator}$outputFileName';
+
+      final receivePort = ReceivePort();
+
+      try {
+        await Isolate.spawn<_PdfMergeMessage>(
+          _pdfMergeWorker,
+          (
+            inputPaths: state.queue.map((f) => f.path).toList(),
+            outputPath: outputPath,
+            sendPort: receivePort.sendPort,
+          ),
+        );
+      } catch (e) {
+        receivePort.close();
+        for (var file in state.queue) {
+          add(UpdateFileStatusEvent(
+            id: file.id,
+            status: ConversionStatus.failed,
+            errorMessage: 'Error al iniciar Isolate de combinación: $e',
+          ));
+        }
+        emit(state.copyWith(isConverting: false));
+        return;
+      }
+
+      final completer = Completer<void>();
+
+      receivePort.listen(
+        (message) async {
+          if (message is int) {
+            final file = state.queue[message];
+            add(UpdateFileStatusEvent(id: file.id, status: ConversionStatus.processing));
+            add(UpdateFileProgressEvent(id: file.id, progress: 0.5));
+          } else if (message == 'saving') {
+            for (var file in state.queue) {
+              add(UpdateFileProgressEvent(id: file.id, progress: 0.9));
+            }
+          } else if (message == 'completed') {
+            receivePort.close();
+
+            final updatedQueue = List<MediaFile>.from(state.queue);
+            final completedFilesForHistory = <MediaFile>[];
+
+            for (var i = 0; i < updatedQueue.length; i++) {
+              final file = updatedQueue[i];
+              final completedFile = file.copyWith(
+                status: ConversionStatus.completed,
+                outputPath: outputPath,
+                progress: 1.0,
+              );
+              updatedQueue[i] = completedFile;
+              completedFilesForHistory.add(completedFile);
+
+              // Delete original file if keepOriginalFiles is false
+              if (!state.keepOriginalFiles) {
+                try {
+                  final fileIo = File(file.path);
+                  if (await fileIo.exists()) {
+                    await fileIo.delete();
+                  }
+                } catch (_) {}
+              }
+            }
+
+            final updatedHistory = List<MediaFile>.from(state.history);
+            updatedHistory.insertAll(0, completedFilesForHistory);
+            await historyStorage.writeHistory(updatedHistory);
+
+            emit(state.copyWith(
+              queue: updatedQueue,
+              history: updatedHistory,
+              isConverting: false,
+            ));
+            completer.complete();
+          } else if (message is String && message.startsWith('error:')) {
+            receivePort.close();
+            final errorMsg = message.replaceFirst('error:', '');
+            for (var file in state.queue) {
+              add(UpdateFileStatusEvent(
+                id: file.id,
+                status: ConversionStatus.failed,
+                errorMessage: errorMsg,
+              ));
+            }
+            emit(state.copyWith(isConverting: false));
+            completer.complete();
+          }
+        },
+        onError: (e) {
+          receivePort.close();
+          for (var file in state.queue) {
+            add(UpdateFileStatusEvent(
+              id: file.id,
+              status: ConversionStatus.failed,
+              errorMessage: 'Error en Isolate: $e',
+            ));
+          }
+          emit(state.copyWith(isConverting: false));
+          completer.complete();
+        },
+      );
+
+      await completer.future;
+      return;
+    }
 
     emit(state.copyWith(isConverting: true, generatedZipPath: null));
 
@@ -225,6 +353,16 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
           outputPath: outputPath,
         ));
         successfulPaths.add(outputPath);
+
+        // Delete original file if keepOriginalFiles is false
+        if (!state.keepOriginalFiles) {
+          try {
+            final fileIo = File(file.path);
+            if (await fileIo.exists()) {
+              await fileIo.delete();
+            }
+          } catch (_) {}
+        }
       } catch (e) {
         add(UpdateFileStatusEvent(
           id: file.id,
@@ -307,6 +445,14 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
     emit(state.copyWith(history: []));
   }
 
+  void _onToggleKeepOriginalFiles(ToggleKeepOriginalFilesEvent event, Emitter<ConverterState> emit) {
+    emit(state.copyWith(keepOriginalFiles: event.keep));
+  }
+
+  void _onToggleMergeIntoSingleFile(ToggleMergeIntoSingleFileEvent event, Emitter<ConverterState> emit) {
+    emit(state.copyWith(mergeIntoSingleFile: event.merge));
+  }
+
   /// Resets the converter queue and halts any active operations.
   void _onResetConverter(ResetConverterEvent event, Emitter<ConverterState> emit) {
     emit(state.copyWith(
@@ -315,4 +461,60 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
       generatedZipPath: null,
     ));
   }
+
+  static void _pdfMergeWorker(_PdfMergeMessage message) async {
+    try {
+      final pdfDoc = pw.Document();
+      for (var i = 0; i < message.inputPaths.length; i++) {
+        message.sendPort.send(i);
+        final file = File(message.inputPaths[i]);
+        if (await file.exists()) {
+          final bytes = await file.readAsBytes();
+          final image = img.decodeImage(bytes);
+          if (image != null) {
+            final pngBytes = img.encodePng(image);
+            pdfDoc.addPage(
+              pw.Page(
+                pageFormat: PdfPageFormat(
+                  image.width.toDouble(),
+                  image.height.toDouble(),
+                  marginAll: 0,
+                ),
+                build: (pw.Context context) {
+                  return pw.Image(
+                    pw.MemoryImage(pngBytes),
+                    fit: pw.BoxFit.fill,
+                  );
+                },
+              ),
+            );
+          } else {
+            throw Exception('No se pudo decodificar la imagen: ${message.inputPaths[i]}');
+          }
+        } else {
+          throw Exception('El archivo original no existe: ${message.inputPaths[i]}');
+        }
+      }
+
+      message.sendPort.send('saving');
+      final pdfBytes = await pdfDoc.save();
+
+      final outputFile = File(message.outputPath);
+      final parentDir = outputFile.parent;
+      if (!await parentDir.exists()) {
+        await parentDir.create(recursive: true);
+      }
+      await outputFile.writeAsBytes(pdfBytes);
+
+      message.sendPort.send('completed');
+    } catch (e) {
+      message.sendPort.send('error: $e');
+    }
+  }
 }
+
+typedef _PdfMergeMessage = ({
+  List<String> inputPaths,
+  String outputPath,
+  SendPort sendPort,
+});

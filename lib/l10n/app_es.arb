@@ -64,5 +64,14 @@
   "windowsMenuDesc": "Añadir opción 'Convertir con Morph' al hacer clic derecho en archivos",
   "themeColor": "Color de tema",
   "clearHistory": "Limpiar Historial",
-  "historyEmpty": "El historial está vacío."
+  "historyEmpty": "El historial está vacío.",
+  "addMoreFiles": "Añadir más archivos",
+  "advancedSettings": "Ajustes Avanzados",
+  "keepOriginalFiles": "Mantener archivos originales",
+  "mergeIntoSingleFile": "Unir en un único PDF",
+  "mergeIntoSingleFileDesc": "Combina todas las imágenes seleccionadas en un único PDF de varias páginas.",
+  "share": "Compartir",
+  "openFolder": "Abrir carpeta",
+  "viewFile": "Ver archivo",
+  "conversionComplete": "Conversión completada"
 }

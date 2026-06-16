@@ -1,9 +1,12 @@
+import 'dart:io';
+import 'package:image/image.dart' as img;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:morph/features/converter/domain/entities/media_file.dart';
 import 'package:morph/features/converter/domain/usecases/convert_file_usecase.dart';
 import 'package:morph/features/converter/domain/usecases/get_media_duration_usecase.dart';
 import 'package:morph/features/converter/presentation/bloc/converter_bloc.dart';
 import 'package:morph/features/converter/presentation/bloc/converter_event.dart';
+import 'package:morph/features/converter/presentation/bloc/converter_state.dart';
 import 'package:morph/services/history_storage_service.dart';
 
 class FakeHistoryStorage extends HistoryStorageService {
@@ -150,5 +153,73 @@ void main() {
 
     // Verify storage has the persisted record
     expect(fakeStorage.history, [expectedCompletedFile]);
+  });
+
+  test('StartConversionEvent with mergeIntoSingleFile creates a single merged PDF and completes all files', () async {
+    final mockFile1 = MediaFile(
+      id: '1',
+      name: 'image1.png',
+      path: 'test_resources/image1.png',
+      sizeBytes: 100,
+      extension: 'PNG',
+      category: 'image',
+      targetFormat: 'PDF',
+      status: ConversionStatus.idle,
+    );
+    final mockFile2 = MediaFile(
+      id: '2',
+      name: 'image2.png',
+      path: 'test_resources/image2.png',
+      sizeBytes: 100,
+      extension: 'PNG',
+      category: 'image',
+      targetFormat: 'PDF',
+      status: ConversionStatus.idle,
+    );
+
+    // Write dummy image files to disk so the bloc can read them
+    final dir = Directory('test_resources');
+    if (!await dir.exists()) {
+      await dir.create();
+    }
+    final cmdImg = img.Image(width: 1, height: 1);
+    final pngBytes = img.encodePng(cmdImg);
+    await File('test_resources/image1.png').writeAsBytes(pngBytes);
+    await File('test_resources/image2.png').writeAsBytes(pngBytes);
+
+    converterBloc.emit(converterBloc.state.copyWith(
+      queue: [mockFile1, mockFile2],
+      activeTool: 'image',
+      targetFormat: 'pdf',
+      mergeIntoSingleFile: true,
+      savePath: 'test_resources',
+    ));
+
+    converterBloc.add(StartConversionEvent());
+
+    // Wait for the conversion to finish
+    await expectLater(
+      converterBloc.stream,
+      emitsThrough(
+        predicate<ConverterState>((state) {
+          return !state.isConverting &&
+              state.queue.every((f) => f.status == ConversionStatus.completed);
+        }),
+      ),
+    );
+
+    // Verify that the files point to the same outputPath
+    final q = converterBloc.state.queue;
+    expect(q[0].outputPath, isNotNull);
+    expect(q[1].outputPath, q[0].outputPath);
+
+    // Clean up
+    await File('test_resources/image1.png').delete();
+    await File('test_resources/image2.png').delete();
+    final mergedFile = File(q[0].outputPath!);
+    if (await mergedFile.exists()) {
+      await mergedFile.delete();
+    }
+    await dir.delete();
   });
 }

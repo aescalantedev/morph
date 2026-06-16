@@ -64,5 +64,14 @@
   "windowsMenuDesc": "Add 'Convert with Morph' option to right-click file menu",
   "themeColor": "Theme Color",
   "clearHistory": "Clear History",
-  "historyEmpty": "The history is empty."
+  "historyEmpty": "The history is empty.",
+  "addMoreFiles": "Add more files",
+  "advancedSettings": "Advanced Settings",
+  "keepOriginalFiles": "Keep original files",
+  "mergeIntoSingleFile": "Merge into single PDF",
+  "mergeIntoSingleFileDesc": "Combines all selected images into a single multi-page PDF document.",
+  "share": "Share",
+  "openFolder": "Open folder",
+  "viewFile": "View file",
+  "conversionComplete": "Conversion completed"
 }

@@ -70,7 +70,7 @@ class AppTheme {
 
   /// Lighter variant of primary color.
   static Color primaryLight(BuildContext context) =>
-      Theme.of(context).colorScheme.primaryContainer;
+      Theme.of(context).colorScheme.primary;
 
   /// Text/icon color on primary elements.
   static Color get onPrimary => const Color(0xFFFFFFFF);
