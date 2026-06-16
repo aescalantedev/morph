@@ -97,6 +97,7 @@ class WeeklyActivityChart extends StatelessWidget {
                     borderColor: AppTheme.border(context),
                     onSurfaceVariantColor: AppTheme.onSurfaceVariant(context),
                     primaryContainerColor: AppTheme.primaryContainer(context),
+                    onPrimaryContainerColor: AppTheme.onPrimaryContainer(context),
                   ),
                 );
               },
@@ -114,6 +115,7 @@ class _ChartPainter extends CustomPainter {
   final Color borderColor;
   final Color onSurfaceVariantColor;
   final Color primaryContainerColor;
+  final Color onPrimaryContainerColor;
 
   _ChartPainter({
     required this.data,
@@ -121,6 +123,7 @@ class _ChartPainter extends CustomPainter {
     required this.borderColor,
     required this.onSurfaceVariantColor,
     required this.primaryContainerColor,
+    required this.onPrimaryContainerColor,
   });
 
   @override
@@ -270,8 +273,8 @@ class _ChartPainter extends CustomPainter {
         final tooltipTextPainter = TextPainter(
           text: TextSpan(
             text: '+${data[i]}',
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: onPrimaryContainerColor,
               fontSize: 9,
               fontWeight: FontWeight.bold,
               fontFamily: 'JetBrains Mono',
@@ -309,5 +312,6 @@ class _ChartPainter extends CustomPainter {
       oldDelegate.primaryColor != primaryColor ||
       oldDelegate.borderColor != borderColor ||
       oldDelegate.onSurfaceVariantColor != onSurfaceVariantColor ||
-      oldDelegate.primaryContainerColor != primaryContainerColor;
+      oldDelegate.primaryContainerColor != primaryContainerColor ||
+      oldDelegate.onPrimaryContainerColor != onPrimaryContainerColor;
 }

@@ -67,19 +67,9 @@ class ActivityTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceContainerLowest(context),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border(context)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0A000000),
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
+    return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

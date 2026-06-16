@@ -40,124 +40,111 @@ class StatsGrid extends StatelessWidget {
     required List<double> sparklineValues,
     required String secondaryMetric,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceContainerLowest(context),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border(context)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0A000000),
-            blurRadius: 4,
-            offset: Offset(0, 2),
+    return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          // Left color stripe
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: 5,
+            child: Container(color: color),
           ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Stack(
-          children: [
-            // Left color stripe
-            Positioned(
-              left: 0,
-              top: 0,
-              bottom: 0,
-              width: 5,
-              child: Container(color: color),
-            ),
-            // Content
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 16, 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title.toUpperCase(),
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: AppTheme.outline(context),
+          // Content
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 16, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title.toUpperCase(),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: AppTheme.outline(context),
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.1,
+                              fontFamily: 'Inter',
+                            ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: bg,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(icon, color: color, size: 16),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          value,
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                letterSpacing: 1.1,
+                                fontSize: 22,
+                                fontFamily: 'JetBrains Mono',
+                                color: AppTheme.onSurface(context),
+                              ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontSize: 10,
+                                color: AppTheme.onSurfaceVariant(context),
                                 fontFamily: 'Inter',
                               ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: bg,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(icon, color: color, size: 16),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            value,
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 22,
-                                  fontFamily: 'JetBrains Mono',
-                                  color: AppTheme.onSurface(context),
-                                ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            subtitle,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontSize: 10,
-                                  color: AppTheme.onSurfaceVariant(context),
-                                  fontFamily: 'Inter',
-                                ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                      // Mini Sparkline
-                      SizedBox(
-                        width: 70,
-                        height: 28,
-                        child: CustomPaint(
-                          painter: _SparklinePainter(
-                            values: sparklineValues,
-                            color: color,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Divider(color: AppTheme.surfaceContainerLow(context), height: 1),
-                  const SizedBox(height: 8),
-                  Text(
-                    secondaryMetric,
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.onSurfaceVariant(context),
-                      fontFamily: 'JetBrains Mono',
+                      ],
                     ),
+                    // Mini Sparkline
+                    SizedBox(
+                      width: 70,
+                      height: 28,
+                      child: CustomPaint(
+                        painter: _SparklinePainter(
+                          values: sparklineValues,
+                          color: color,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Divider(color: AppTheme.surfaceContainerLow(context), height: 1),
+                const SizedBox(height: 8),
+                Text(
+                  secondaryMetric,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.onSurfaceVariant(context),
+                    fontFamily: 'JetBrains Mono',
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -232,8 +219,8 @@ class StatsGrid extends StatelessWidget {
               title: localizations.storage,
               value: storageUsed,
               icon: Icons.cloud_queue,
-              color: AppTheme.warning,
-              bg: AppTheme.warning.withValues(alpha: 0.08),
+              color: AppTheme.warning(context),
+              bg: AppTheme.warning(context).withValues(alpha: 0.08),
               subtitle: 'De 100GB disponibles',
               sparklineValues: const [2.1, 2.2, 2.2, 2.3, 2.3, 2.4, 2.4],
               secondaryMetric: 'USO: 2.4% TOTAL',

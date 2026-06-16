@@ -64,13 +64,13 @@ class ConverterPage extends StatelessWidget {
                       Icon(
                         tool['icon'] as IconData,
                         size: 16,
-                        color: isSelected ? AppTheme.primaryLight(context) : const Color(0xFFA1A1AA),
+                        color: isSelected ? AppTheme.primary(context) : AppTheme.onSurfaceVariant(context),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         tool['name'] as String,
                         style: TextStyle(
-                          color: isSelected ? AppTheme.primaryLight(context) : const Color(0xFFA1A1AA),
+                          color: isSelected ? AppTheme.primary(context) : AppTheme.onSurfaceVariant(context),
                           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                           fontSize: 13,
                         ),
