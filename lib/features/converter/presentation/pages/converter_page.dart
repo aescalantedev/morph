@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:morph/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/media_file.dart';
@@ -129,6 +131,55 @@ class ConverterPage extends StatelessWidget {
     );
   }
 
+  Future<void> _handleDroppedFiles(BuildContext context, List<dynamic> files, String activeTool) async {
+    final List<MediaFile> selectedFiles = [];
+
+    // Category extensions maps for validation
+    const imageExts = {'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'heic', 'tiff', 'svg'};
+    const videoExts = {'mp4', 'webm', 'gif', 'mkv', 'avi', 'mov', 'flv', 'wmv'};
+    const audioExts = {'mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac'};
+
+    for (var file in files) {
+      final path = file.path;
+      if (path == null) continue;
+
+      final fileName = file.name;
+      final fileExt = fileName.contains('.') ? fileName.split('.').last.toLowerCase() : '';
+
+      // Validate that the dropped file format matches the active tab tool
+      bool matches = false;
+      if (activeTool == 'image' && imageExts.contains(fileExt)) {
+        matches = true;
+      } else if (activeTool == 'video' && videoExts.contains(fileExt)) {
+        matches = true;
+      } else if (activeTool == 'audio' && audioExts.contains(fileExt)) {
+        matches = true;
+      }
+
+      if (!matches) continue;
+
+      try {
+        final fileIo = File(path);
+        if (await fileIo.exists()) {
+          final length = await fileIo.length();
+          selectedFiles.add(MediaFile(
+            id: '${DateTime.now().microsecondsSinceEpoch}_$path',
+            name: fileName,
+            path: path,
+            sizeBytes: length,
+            extension: fileExt.toUpperCase(),
+            category: activeTool,
+            targetFormat: '',
+          ));
+        }
+      } catch (_) {}
+    }
+
+    if (selectedFiles.isNotEmpty && context.mounted) {
+      context.read<ConverterBloc>().add(AddFilesEvent(selectedFiles));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
@@ -154,7 +205,7 @@ class ConverterPage extends StatelessWidget {
           );
         }
 
-        return LayoutBuilder(
+        final Widget content = LayoutBuilder(
           builder: (context, constraints) {
             final isDesktop = constraints.maxWidth >= 850;
 
@@ -301,6 +352,17 @@ class ConverterPage extends StatelessWidget {
             }
           },
         );
+
+        if (state.queue.isNotEmpty && !state.isConverting) {
+          return DropTarget(
+            onDragDone: (detail) {
+              _handleDroppedFiles(context, detail.files, state.activeTool);
+            },
+            child: content,
+          );
+        }
+
+        return content;
       },
     );
   }

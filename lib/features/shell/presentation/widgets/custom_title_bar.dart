@@ -1,26 +1,18 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 import '../../../../core/theme/app_theme.dart';
 
-/// A custom dynamic window title bar for desktop platforms.
-///
-/// Integrates with the [window_manager] package to hide native title borders,
-/// support window dragging via [DragToMoveArea], and present custom styled
-/// minimize, maximize/restore, and close buttons that adapt to the application theme.
-class CustomTitleBar extends StatefulWidget implements PreferredSizeWidget {
-  /// Creates a [CustomTitleBar] widget.
-  const CustomTitleBar({super.key});
+/// A reusable widget representing window controls (minimize, maximize/restore, close)
+/// for custom desktop title bars.
+class WindowControls extends StatefulWidget {
+  /// Creates a [WindowControls] widget.
+  const WindowControls({super.key});
 
   @override
-  State<CustomTitleBar> createState() => _CustomTitleBarState();
-
-  @override
-  Size get preferredSize => const Size.fromHeight(40);
+  State<WindowControls> createState() => _WindowControlsState();
 }
 
-class _CustomTitleBarState extends State<CustomTitleBar> with WindowListener {
+class _WindowControlsState extends State<WindowControls> with WindowListener {
   bool _isMaximized = false;
 
   @override
@@ -83,91 +75,35 @@ class _CustomTitleBarState extends State<CustomTitleBar> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
-    // Only render on desktop platforms
-    final isDesktop = !kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux);
-    if (!isDesktop) return const SizedBox.shrink();
-
     final onSurface = AppTheme.onSurface(context);
-    final border = AppTheme.border(context);
 
-    return Container(
-      height: 40,
-      decoration: BoxDecoration(
-        color: AppTheme.surface(context),
-        border: Border(bottom: BorderSide(color: border, width: 0.5)),
-      ),
-      child: Row(
-        children: [
-          // Logo and Title draggable area
-          Expanded(
-            child: DragToMoveArea(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                alignment: Alignment.centerLeft,
-                color: Colors.transparent, // Required to capture mouse events on full area
-                child: Row(
-                  children: [
-                    Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: AppTheme.primary(context),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'M',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 10,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Morph',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: onSurface,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          // Window controls
-          Row(
-            children: [
-              _buildControlButton(
-                icon: Icons.remove,
-                onTap: () => windowManager.minimize(),
-                iconColor: onSurface,
-              ),
-              _buildControlButton(
-                icon: _isMaximized ? Icons.filter_none_outlined : Icons.crop_square_outlined,
-                onTap: () async {
-                  if (_isMaximized) {
-                    await windowManager.unmaximize();
-                  } else {
-                    await windowManager.maximize();
-                  }
-                },
-                iconColor: onSurface,
-              ),
-              _buildControlButton(
-                icon: Icons.close,
-                onTap: () => windowManager.close(),
-                iconColor: onSurface,
-                hoverColor: const Color(0xFFE11D48), // Rose red
-                iconHoverColor: Colors.white,
-              ),
-            ],
-          ),
-        ],
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildControlButton(
+          icon: Icons.remove,
+          onTap: () => windowManager.minimize(),
+          iconColor: onSurface,
+        ),
+        _buildControlButton(
+          icon: _isMaximized ? Icons.filter_none_outlined : Icons.crop_square_outlined,
+          onTap: () async {
+            if (_isMaximized) {
+              await windowManager.unmaximize();
+            } else {
+              await windowManager.maximize();
+            }
+          },
+          iconColor: onSurface,
+        ),
+        _buildControlButton(
+          icon: Icons.close,
+          onTap: () => windowManager.close(),
+          iconColor: onSurface,
+          hoverColor: const Color(0xFFE11D48), // Rose red
+          iconHoverColor: Colors.white,
+        ),
+      ],
     );
   }
 }
