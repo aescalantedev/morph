@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:morph/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../domain/entities/media_file.dart';
 
 /// A card widget representing a single media file in the conversion queue.
@@ -18,12 +19,16 @@ class FileCard extends StatelessWidget {
   /// Callback when the close/remove button is pressed.
   final VoidCallback onRemove;
 
+  /// Callback when the target format is modified.
+  final ValueChanged<String>? onTargetFormatChanged;
+
   /// Creates a [FileCard] widget.
   const FileCard({
     super.key,
     required this.file,
     required this.isConverting,
     required this.onRemove,
+    this.onTargetFormatChanged,
   });
 
   /// Formats byte size into readable string units (e.g. '3.5 MB').
@@ -189,6 +194,11 @@ class FileCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
+                // Format Selector Dropdown
+                if (file.status == ConversionStatus.idle && !isConverting) ...[
+                  _buildFormatDropdown(context),
+                  const SizedBox(width: 12),
+                ],
                 // Status Badge
                 _buildStatusBadge(context, localizations),
                 const SizedBox(width: 12),
@@ -221,6 +231,73 @@ class FileCard extends StatelessWidget {
             ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFormatDropdown(BuildContext context) {
+    final formats = (AppConstants.formatsByCategory[file.category] ?? [])
+        .where((format) => format.toLowerCase() != file.extension.toLowerCase())
+        .toList();
+    if (formats.isEmpty || onTargetFormatChanged == null) return const SizedBox.shrink();
+
+    final currentTarget = file.targetFormat.toLowerCase();
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'a ',
+          style: TextStyle(
+            fontSize: 11,
+            color: AppTheme.onSurfaceVariant(context),
+            fontFamily: 'Inter',
+          ),
+        ),
+        const SizedBox(width: 4),
+        Container(
+          height: 28,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceContainerLow(context),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppTheme.border(context)),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: formats.contains(currentTarget) ? currentTarget : formats.first,
+              items: formats.map((format) {
+                return DropdownMenuItem<String>(
+                  value: format.toLowerCase(),
+                  child: Text(
+                    format.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.primaryLight(context),
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                );
+              }).toList(),
+              onChanged: isConverting || file.status == ConversionStatus.processing
+                  ? null
+                  : (val) {
+                      if (val != null) {
+                        onTargetFormatChanged!(val);
+                      }
+                    },
+              icon: Icon(
+                Icons.keyboard_arrow_down,
+                size: 14,
+                color: AppTheme.onSurfaceVariant(context),
+              ),
+              dropdownColor: AppTheme.surface(context),
+              borderRadius: BorderRadius.circular(12),
+              isDense: true,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

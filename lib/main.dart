@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:morph/l10n/app_localizations.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 
 import 'core/di/injection_container.dart' as di;
 import 'core/navigation/app_router.dart';
@@ -124,39 +125,52 @@ class MyApp extends StatelessWidget {
         builder: (context, settingsState) {
           // Determine dynamically if dark theme is active to update static AppTheme helpers
           final isSystemDark = PlatformDispatcher.instance.platformBrightness == Brightness.dark;
-          AppTheme.isDark = settingsState.themeMode == ThemeMode.dark ||
+          final isDark = settingsState.themeMode == ThemeMode.dark ||
               (settingsState.themeMode == ThemeMode.system && isSystemDark);
+          AppTheme.isDark = isDark;
 
-          return MaterialApp.router(
-            title: 'Morph',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme(settingsState.themeColor),
-            darkTheme: AppTheme.darkTheme(settingsState.themeColor),
-            themeMode: settingsState.themeMode,
-            locale: settingsState.locale,
-            routerConfig: appRouter,
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale('es', ''), // Spanish
-              Locale('en', ''), // English
-            ],
-            localeResolutionCallback: (locale, supportedLocales) {
-              if (settingsState.locale != null) {
-                return settingsState.locale;
-              }
-              if (locale != null) {
-                for (var supportedLocale in supportedLocales) {
-                  if (supportedLocale.languageCode == locale.languageCode) {
-                    return supportedLocale;
+          final initTheme = isDark
+              ? AppTheme.darkTheme(settingsState.themeColor)
+              : AppTheme.lightTheme(settingsState.themeColor);
+
+          return ThemeProvider(
+            initTheme: initTheme,
+            builder: (context, theme) {
+              return MaterialApp.router(
+                title: 'Morph',
+                debugShowCheckedModeBanner: false,
+                theme: theme,
+                locale: settingsState.locale,
+                routerConfig: appRouter,
+                builder: (context, child) {
+                  return ThemeSwitchingArea(
+                    child: child ?? const SizedBox(),
+                  );
+                },
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                supportedLocales: const [
+                  Locale('es', ''), // Spanish
+                  Locale('en', ''), // English
+                ],
+                localeResolutionCallback: (locale, supportedLocales) {
+                  if (settingsState.locale != null) {
+                    return settingsState.locale;
                   }
-                }
-              }
-              return supportedLocales.first; // Default to Spanish as configured in l10n.yaml
+                  if (locale != null) {
+                    for (var supportedLocale in supportedLocales) {
+                      if (supportedLocale.languageCode == locale.languageCode) {
+                        return supportedLocale;
+                      }
+                    }
+                  }
+                  return supportedLocales.first; // Default to Spanish as configured in l10n.yaml
+                },
+              );
             },
           );
         },

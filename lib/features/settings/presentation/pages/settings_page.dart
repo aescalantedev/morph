@@ -11,6 +11,8 @@ import '../../../converter/presentation/bloc/converter_state.dart';
 import '../bloc/settings_bloc.dart';
 import '../bloc/settings_event.dart';
 import '../bloc/settings_state.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 
 /// The page containing user preferences (appearance, language, notification controls)
 /// and technical details about the conversion engine.
@@ -70,28 +72,64 @@ class SettingsPage extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              _buildSegmentedButton(
-                context: context,
-                label: localizations.themeLight,
-                icon: Icons.light_mode_outlined,
-                isSelected: settingsState.themeMode == ThemeMode.light,
-                onTap: () => context.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.light)),
+              ThemeSwitcher(
+                clipper: const ThemeSwitcherCircleClipper(),
+                builder: (switcherContext) => _buildSegmentedButton(
+                  context: context,
+                  label: localizations.themeLight,
+                  icon: Icons.light_mode_outlined,
+                  isSelected: settingsState.themeMode == ThemeMode.light,
+                  onTap: () {
+                    if (settingsState.themeMode != ThemeMode.light) {
+                      ThemeSwitcher.of(switcherContext).changeTheme(
+                        theme: AppTheme.lightTheme(settingsState.themeColor),
+                        isReversed: false,
+                      );
+                      context.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.light));
+                    }
+                  },
+                ),
               ),
               const SizedBox(width: 8),
-              _buildSegmentedButton(
-                context: context,
-                label: localizations.themeDark,
-                icon: Icons.dark_mode_outlined,
-                isSelected: settingsState.themeMode == ThemeMode.dark,
-                onTap: () => context.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.dark)),
+              ThemeSwitcher(
+                clipper: const ThemeSwitcherCircleClipper(),
+                builder: (switcherContext) => _buildSegmentedButton(
+                  context: context,
+                  label: localizations.themeDark,
+                  icon: Icons.dark_mode_outlined,
+                  isSelected: settingsState.themeMode == ThemeMode.dark,
+                  onTap: () {
+                    if (settingsState.themeMode != ThemeMode.dark) {
+                      ThemeSwitcher.of(switcherContext).changeTheme(
+                        theme: AppTheme.darkTheme(settingsState.themeColor),
+                        isReversed: true,
+                      );
+                      context.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.dark));
+                    }
+                  },
+                ),
               ),
               const SizedBox(width: 8),
-              _buildSegmentedButton(
-                context: context,
-                label: localizations.themeSystem,
-                icon: Icons.settings_brightness_outlined,
-                isSelected: settingsState.themeMode == ThemeMode.system,
-                onTap: () => context.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.system)),
+              ThemeSwitcher(
+                clipper: const ThemeSwitcherCircleClipper(),
+                builder: (switcherContext) => _buildSegmentedButton(
+                  context: context,
+                  label: localizations.themeSystem,
+                  icon: Icons.settings_brightness_outlined,
+                  isSelected: settingsState.themeMode == ThemeMode.system,
+                  onTap: () {
+                    if (settingsState.themeMode != ThemeMode.system) {
+                      final isSystemDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+                      ThemeSwitcher.of(switcherContext).changeTheme(
+                        theme: isSystemDark
+                            ? AppTheme.darkTheme(settingsState.themeColor)
+                            : AppTheme.lightTheme(settingsState.themeColor),
+                        isReversed: isSystemDark,
+                      );
+                      context.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.system));
+                    }
+                  },
+                ),
               ),
             ],
           ),
@@ -375,43 +413,55 @@ class SettingsPage extends StatelessWidget {
       message: tooltip,
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: () {
-            context.read<SettingsBloc>().add(UpdateThemeColorEvent(color));
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: isSelected
-                    ? (Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black87)
-                    : Colors.transparent,
-                width: 3,
-              ),
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: color.withValues(alpha: 0.4),
-                        blurRadius: 8,
-                        spreadRadius: 2,
+        child: ThemeSwitcher(
+          clipper: const ThemeSwitcherCircleClipper(),
+          builder: (switcherContext) {
+            return GestureDetector(
+              onTap: () {
+                if (!isSelected) {
+                  final isDark = Theme.of(switcherContext).brightness == Brightness.dark;
+                  final newTheme = isDark
+                      ? AppTheme.darkTheme(color)
+                      : AppTheme.lightTheme(color);
+                  ThemeSwitcher.of(switcherContext).changeTheme(theme: newTheme);
+                  context.read<SettingsBloc>().add(UpdateThemeColorEvent(color));
+                }
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isSelected
+                        ? (Theme.of(switcherContext).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black87)
+                        : Colors.transparent,
+                    width: 3,
+                  ),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: color.withValues(alpha: 0.4),
+                            blurRadius: 8,
+                            spreadRadius: 2,
+                          )
+                        ]
+                      : null,
+                ),
+                child: isSelected
+                    ? const Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: 18,
                       )
-                    ]
-                  : null,
-            ),
-            child: isSelected
-                ? const Icon(
-                    Icons.check,
-                    color: Colors.white,
-                    size: 18,
-                  )
-                : null,
-          ),
+                    : null,
+              ),
+            );
+          },
         ),
       ),
     );
@@ -503,7 +553,105 @@ class SettingsPage extends StatelessWidget {
             value: localizations.freeSoftwareDesc,
             valueColor: AppTheme.primary(context),
           ),
+          Divider(height: 24, thickness: 0.5, color: AppTheme.border(context)),
+
+          // --- SUPPORT & HELP ---
+          _buildClickableInfoRow(
+            context: context,
+            icon: Icons.help_outline,
+            title: localizations.supportAndHelp,
+            value: 'soporte@aescalante.dev',
+            onTap: () => _launchURL(context, 'mailto:soporte@aescalante.dev'),
+          ),
+          Divider(height: 24, thickness: 0.5, color: AppTheme.border(context)),
+
+          // --- WEBSITE ---
+          _buildClickableInfoRow(
+            context: context,
+            icon: Icons.public_outlined,
+            title: localizations.visitWebsite,
+            value: 'aescalante.dev',
+            onTap: () => _launchURL(context, 'https://www.aescalante.dev/'),
+          ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _launchURL(BuildContext context, String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    try {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('No se pudo abrir $urlString: $e'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _buildClickableInfoRow({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String value,
+    required VoidCallback onTap,
+    Color? valueColor,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, size: 20, color: AppTheme.primary(context)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppTheme.onSurfaceVariant(context).withValues(alpha: 0.6),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          value,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: valueColor ?? AppTheme.primary(context),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.open_in_new_rounded,
+                          size: 13,
+                          color: valueColor ?? AppTheme.primary(context),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

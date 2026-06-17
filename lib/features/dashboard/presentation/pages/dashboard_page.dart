@@ -85,13 +85,18 @@ class _DashboardPageState extends State<DashboardPage> {
       category = 'audio';
     }
 
+    final selectedFormat = _allowedTargetFormats[category]!.firstWhere(
+      (format) => format.toUpperCase() != fileExt.toUpperCase(),
+      orElse: () => _allowedTargetFormats[category]!.first,
+    );
+
     setState(() {
       _selectedFilePath = path;
       _selectedFileName = name;
       _selectedFileSize = size;
       _fileCategory = category;
       _fileExtension = fileExt.toUpperCase();
-      _targetFormat = _allowedTargetFormats[category]!.first;
+      _targetFormat = selectedFormat;
     });
   }
 
@@ -395,7 +400,9 @@ class _DashboardPageState extends State<DashboardPage> {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: _allowedTargetFormats[_fileCategory]!.map((format) {
+                children: _allowedTargetFormats[_fileCategory]!
+                    .where((format) => format.toUpperCase() != _fileExtension.toUpperCase())
+                    .map((format) {
                   final isSelected = _targetFormat == format;
                   return ChoiceChip(
                     label: Text(format),

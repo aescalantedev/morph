@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:archive/archive_io.dart';
 import '../../../../core/di/injection_container.dart' as di;
+import '../../../../core/constants/app_constants.dart';
 import '../../../../services/notification_service.dart';
 import '../../../../services/history_storage_service.dart';
 import '../../../settings/presentation/bloc/settings_bloc.dart';
@@ -55,6 +56,7 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
     on<ClearHistoryEvent>(_onClearHistory);
     on<ToggleKeepOriginalFilesEvent>(_onToggleKeepOriginalFiles);
     on<ToggleMergeIntoSingleFileEvent>(_onToggleMergeIntoSingleFile);
+    on<UpdateFileTargetFormatEvent>(_onUpdateFileTargetFormat);
 
     _initializeDefaultSavePath();
   }
@@ -81,8 +83,21 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
 
     for (var file in event.files) {
       if (updatedQueue.any((f) => f.path == file.path)) continue;
-      updatedQueue.add(file);
-      newFilesToProcess.add(file);
+      // Ensure targetFormat is initialized to the current global targetFormat if not set
+      String targetFormat = file.targetFormat.isEmpty ? state.targetFormat : file.targetFormat;
+      
+      // If targetFormat matches the file's source extension, pick a different one
+      if (targetFormat.toLowerCase() == file.extension.toLowerCase()) {
+        final formats = AppConstants.formatsByCategory[file.category] ?? [];
+        targetFormat = formats.firstWhere(
+          (fmt) => fmt.toLowerCase() != file.extension.toLowerCase(),
+          orElse: () => targetFormat,
+        );
+      }
+
+      final updatedFile = file.copyWith(targetFormat: targetFormat);
+      updatedQueue.add(updatedFile);
+      newFilesToProcess.add(updatedFile);
     }
 
     emit(state.copyWith(queue: updatedQueue));
@@ -105,6 +120,17 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
     }
   }
 
+  /// Event handler to update target format for a specific file in the queue.
+  void _onUpdateFileTargetFormat(UpdateFileTargetFormatEvent event, Emitter<ConverterState> emit) {
+    final updatedQueue = state.queue.map((file) {
+      if (file.id == event.id) {
+        return file.copyWith(targetFormat: event.targetFormat);
+      }
+      return file;
+    }).toList();
+    emit(state.copyWith(queue: updatedQueue));
+  }
+
   /// Event handler for removing a file from the queue.
   void _onRemoveFile(RemoveFileEvent event, Emitter<ConverterState> emit) {
     final updatedQueue = state.queue.where((f) => f.id != event.id).toList();
@@ -118,7 +144,14 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
 
   /// Event handler for changing the target format extension.
   void _onChangeTargetFormat(ChangeTargetFormatEvent event, Emitter<ConverterState> emit) {
-    emit(state.copyWith(targetFormat: event.format));
+    final updatedQueue = state.queue.map((file) {
+      if (event.format.toLowerCase() == file.extension.toLowerCase()) {
+        // Keep the file's current targetFormat since the new global format is identical to its source format
+        return file;
+      }
+      return file.copyWith(targetFormat: event.format);
+    }).toList();
+    emit(state.copyWith(targetFormat: event.format, queue: updatedQueue));
   }
 
   /// Event handler for changing compression quality.
@@ -330,14 +363,15 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
 
       add(UpdateFileStatusEvent(id: file.id, status: ConversionStatus.processing));
 
+      final fileTargetFormat = file.targetFormat.isNotEmpty ? file.targetFormat.toLowerCase() : state.targetFormat.toLowerCase();
       final lastDotIdx = file.name.lastIndexOf('.');
       final inputFileName = lastDotIdx != -1 ? file.name.substring(0, lastDotIdx) : file.name;
-      final outputFileName = '${inputFileName}_converted.${state.targetFormat.toLowerCase()}';
+      final outputFileName = '${inputFileName}_converted.$fileTargetFormat';
       final outputPath = '${state.savePath}${Platform.pathSeparator}$outputFileName';
 
       try {
         final stream = convertFileUseCase(
-          file: file.copyWith(targetFormat: state.targetFormat),
+          file: file.copyWith(targetFormat: fileTargetFormat),
           outputPath: outputPath,
           quality: state.quality,
         );

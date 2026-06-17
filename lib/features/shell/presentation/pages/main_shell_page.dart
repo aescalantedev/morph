@@ -9,6 +9,8 @@ import '../../../shared/presentation/widgets/unified_desktop_header.dart';
 import '../../../settings/presentation/bloc/settings_bloc.dart';
 import '../../../settings/presentation/bloc/settings_state.dart';
 import '../../../settings/presentation/bloc/settings_event.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 
 /// The primary shell page that provides a responsive layout for the application.
 ///
@@ -31,6 +33,90 @@ class MainShellPage extends StatefulWidget {
 
 class _MainShellPageState extends State<MainShellPage> {
   bool? _isSidebarExtended;
+
+  Future<void> _launchURL(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    try {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('No se pudo abrir $urlString: $e'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _buildSidebarAction({
+    required BuildContext context,
+    required bool isExtended,
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    String? tooltip,
+  }) {
+    final content = isExtended
+        ? Row(
+            children: [
+              Icon(
+                icon,
+                color: AppTheme.onSurfaceVariant(context),
+                size: 18,
+              ),
+              const SizedBox(width: 14),
+              Text(
+                label,
+                style: TextStyle(
+                  color: AppTheme.onSurfaceVariant(context),
+                  fontWeight: FontWeight.normal,
+                  fontSize: 13,
+                  fontFamily: 'Inter',
+                ),
+              ),
+            ],
+          )
+        : Center(
+            child: Icon(
+              icon,
+              color: AppTheme.onSurfaceVariant(context),
+              size: 20,
+            ),
+          );
+
+    final itemWidget = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: isExtended ? 16 : 0,
+              vertical: 12,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: content,
+          ),
+        ),
+      ),
+    );
+
+    if (!isExtended && tooltip != null) {
+      return Tooltip(
+        message: tooltip,
+        child: itemWidget,
+      );
+    }
+
+    return itemWidget;
+  }
 
   /// Builds the custom minimalist sidebar for desktop/tablet layouts.
   Widget _buildCustomSidebar(BuildContext context, bool isExtended, AppLocalizations localizations) {
@@ -170,186 +256,215 @@ class _MainShellPageState extends State<MainShellPage> {
             ),
           ),
 
-          // Help & Support section
-          if (isExtended) ...[
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8, left: 24),
-              child: Row(
-                children: [
-                  Icon(Icons.help_outline, size: 16, color: AppTheme.onSurfaceVariant(context)),
-                  const SizedBox(width: 10),
-                  Text(
-                    'Soporte & Ayuda',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.onSurfaceVariant(context),
-                      fontFamily: 'Inter',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ] else ...[
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Icon(Icons.help_outline, size: 18, color: AppTheme.onSurfaceVariant(context)),
-            ),
-          ],
+          // Help & Support & Website links
+          _buildSidebarAction(
+            context: context,
+            isExtended: isExtended,
+            icon: Icons.help_outline,
+            label: localizations.supportAndHelp,
+            tooltip: localizations.supportAndHelp,
+            onTap: () => _launchURL('mailto:soporte@aescalante.dev'),
+          ),
+          _buildSidebarAction(
+            context: context,
+            isExtended: isExtended,
+            icon: Icons.public_outlined,
+            label: 'aescalante.dev',
+            tooltip: localizations.visitWebsite,
+            onTap: () => _launchURL('https://www.aescalante.dev/'),
+          ),
 
           // Theme Toggle at bottom of sidebar (Brainwave style)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            child: BlocBuilder<SettingsBloc, SettingsState>(
-              builder: (context, settingsState) {
-                final isDark = settingsState.themeMode == ThemeMode.dark ||
-                    (settingsState.themeMode == ThemeMode.system &&
-                        MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+            child: ThemeSwitcher(
+              clipper: const ThemeSwitcherCircleClipper(),
+              builder: (context) {
+                return BlocBuilder<SettingsBloc, SettingsState>(
+                  builder: (blocContext, settingsState) {
+                    final isDark = settingsState.themeMode == ThemeMode.dark ||
+                        (settingsState.themeMode == ThemeMode.system &&
+                            MediaQuery.platformBrightnessOf(blocContext) == Brightness.dark);
 
-                if (isExtended) {
-                  // Expanded mode: pill switch
-                  return Container(
-                    height: 38,
-                    padding: const EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                      color: AppTheme.surfaceContainerLow(context),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppTheme.border(context)),
-                    ),
-                    child: Row(
-                      children: [
-                        // Light Mode Option
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              context.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.light));
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: !isDark
-                                    ? AppTheme.surface(context)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: !isDark
-                                    ? [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.05),
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 2),
-                                        )
-                                      ]
-                                    : null,
-                              ),
-                              alignment: Alignment.center,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.light_mode_outlined,
-                                    size: 15,
+                    if (isExtended) {
+                      // Expanded mode: pill switch
+                      return Container(
+                        height: 38,
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceContainerLow(blocContext),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppTheme.border(blocContext)),
+                        ),
+                        child: Row(
+                          children: [
+                            // Light Mode Option
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  if (isDark) {
+                                    ThemeSwitcher.of(context).changeTheme(
+                                      theme: AppTheme.lightTheme(settingsState.themeColor),
+                                      isReversed: false,
+                                    );
+                                    blocContext.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.light));
+                                  }
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
                                     color: !isDark
-                                        ? AppTheme.primary(context)
-                                        : AppTheme.onSurfaceVariant(context),
+                                        ? AppTheme.surface(blocContext)
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: !isDark
+                                        ? [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(alpha: 0.05),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, 2),
+                                            )
+                                          ]
+                                        : null,
                                   ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    'Claro',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: !isDark ? FontWeight.w600 : FontWeight.normal,
-                                      color: !isDark
-                                          ? AppTheme.primary(context)
-                                          : AppTheme.onSurfaceVariant(context),
-                                      fontFamily: 'Inter',
-                                    ),
+                                  alignment: Alignment.center,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.light_mode_outlined,
+                                        size: 15,
+                                        color: !isDark
+                                            ? AppTheme.primary(blocContext)
+                                            : AppTheme.onSurfaceVariant(blocContext),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        'Claro',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: !isDark ? FontWeight.w600 : FontWeight.normal,
+                                          color: !isDark
+                                              ? AppTheme.primary(blocContext)
+                                              : AppTheme.onSurfaceVariant(blocContext),
+                                          fontFamily: 'Inter',
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                        // Dark Mode Option
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              context.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.dark));
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? AppTheme.surface(context)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: isDark
-                                    ? [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.05),
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 2),
-                                        )
-                                      ]
-                                    : null,
-                              ),
-                              alignment: Alignment.center,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.dark_mode_outlined,
-                                    size: 15,
+                            // Dark Mode Option
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  if (!isDark) {
+                                    ThemeSwitcher.of(context).changeTheme(
+                                      theme: AppTheme.darkTheme(settingsState.themeColor),
+                                      isReversed: true,
+                                    );
+                                    blocContext.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.dark));
+                                  }
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
                                     color: isDark
-                                        ? AppTheme.primaryLight(context)
-                                        : AppTheme.onSurfaceVariant(context),
+                                        ? AppTheme.surface(blocContext)
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: isDark
+                                        ? [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(alpha: 0.05),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, 2),
+                                            )
+                                          ]
+                                        : null,
                                   ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    'Oscuro',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: isDark ? FontWeight.w600 : FontWeight.normal,
-                                      color: isDark
-                                          ? AppTheme.primaryLight(context)
-                                          : AppTheme.onSurfaceVariant(context),
-                                      fontFamily: 'Inter',
-                                    ),
+                                  alignment: Alignment.center,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.dark_mode_outlined,
+                                        size: 15,
+                                        color: isDark
+                                            ? AppTheme.primaryLight(blocContext)
+                                            : AppTheme.onSurfaceVariant(blocContext),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        'Oscuro',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: isDark ? FontWeight.w600 : FontWeight.normal,
+                                          color: isDark
+                                              ? AppTheme.primaryLight(blocContext)
+                                              : AppTheme.onSurfaceVariant(blocContext),
+                                          fontFamily: 'Inter',
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      // Collapsed mode: single circular toggle button
+                      return InkWell(
+                        onTap: () {
+                          final nextMode = isDark ? ThemeMode.light : ThemeMode.dark;
+                          ThemeSwitcher.of(context).changeTheme(
+                            theme: isDark
+                                ? AppTheme.lightTheme(settingsState.themeColor)
+                                : AppTheme.darkTheme(settingsState.themeColor),
+                            isReversed: isDark,
+                          );
+                          blocContext.read<SettingsBloc>().add(UpdateThemeModeEvent(nextMode));
+                        },
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: AppTheme.surfaceContainerLow(blocContext),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppTheme.border(blocContext)),
+                          ),
+                          child: Icon(
+                            isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                            size: 18,
+                            color: AppTheme.onSurfaceVariant(blocContext),
                           ),
                         ),
-                      ],
-                    ),
-                  );
-                } else {
-                  // Collapsed mode: single circular toggle button
-                  return InkWell(
-                    onTap: () {
-                      final nextMode = isDark ? ThemeMode.light : ThemeMode.dark;
-                      context.read<SettingsBloc>().add(UpdateThemeModeEvent(nextMode));
-                    },
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: AppTheme.surfaceContainerLow(context),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppTheme.border(context)),
-                      ),
-                      child: Icon(
-                        isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-                        size: 18,
-                        color: AppTheme.onSurfaceVariant(context),
-                      ),
-                    ),
-                  );
-                }
+                      );
+                    }
+                  },
+                );
               },
             ),
           ),
         ],
       ),
     );
+  }
+
+  String _getHeaderTitle(BuildContext context, AppLocalizations localizations) {
+    final String currentPath = GoRouterState.of(context).uri.path;
+    if (currentPath == '/dashboard') {
+      return localizations.dashboard;
+    } else if (currentPath.startsWith('/convert')) {
+      return localizations.newConversion;
+    } else if (currentPath == '/history') {
+      return localizations.history;
+    } else if (currentPath == '/settings') {
+      return localizations.settings;
+    }
+    return localizations.newConversion;
   }
 
   @override
@@ -379,13 +494,7 @@ class _MainShellPageState extends State<MainShellPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           UnifiedDesktopHeader(
-                            title: widget.navigationShell.currentIndex == 0
-                                ? localizations.dashboard
-                                : (widget.navigationShell.currentIndex == 1
-                                    ? localizations.newConversion
-                                    : (widget.navigationShell.currentIndex == 2
-                                        ? localizations.history
-                                        : localizations.settings)),
+                            title: _getHeaderTitle(context, localizations),
                           ),
                           Expanded(
                             child: widget.navigationShell,
@@ -440,13 +549,7 @@ class _MainShellPageState extends State<MainShellPage> {
                   ? PreferredSize(
                       preferredSize: const Size.fromHeight(40),
                       child: UnifiedDesktopHeader(
-                        title: widget.navigationShell.currentIndex == 0
-                            ? localizations.dashboard
-                            : (widget.navigationShell.currentIndex == 1
-                                ? localizations.newConversion
-                                : (widget.navigationShell.currentIndex == 2
-                                    ? localizations.history
-                                    : localizations.settings)),
+                        title: _getHeaderTitle(context, localizations),
                       ),
                     )
                   : AppBar(

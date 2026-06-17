@@ -541,6 +541,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Conversión completada'**
   String get conversionComplete;
+
+  /// No description provided for @supportAndHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Soporte & Ayuda'**
+  String get supportAndHelp;
+
+  /// No description provided for @visitWebsite.
+  ///
+  /// In es, this message translates to:
+  /// **'Visitar Web'**
+  String get visitWebsite;
 }
 
 class _AppLocalizationsDelegate

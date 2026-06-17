@@ -11,6 +11,7 @@ import '../bloc/converter_state.dart';
 import '../widgets/dropzone_area.dart';
 import '../widgets/file_card.dart';
 import '../widgets/settings_panel.dart';
+import '../widgets/expandable_settings_bottom_sheet.dart';
 import '../widgets/conversion_progress.dart';
 import '../widgets/file_picker_helper.dart';
 
@@ -133,6 +134,7 @@ class ConverterPage extends StatelessWidget {
 
   Future<void> _handleDroppedFiles(BuildContext context, List<dynamic> files, String activeTool) async {
     final List<MediaFile> selectedFiles = [];
+    final defaultFormat = context.read<ConverterBloc>().state.targetFormat.toLowerCase();
 
     // Category extensions maps for validation
     const imageExts = {'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'heic', 'tiff', 'svg'};
@@ -169,7 +171,7 @@ class ConverterPage extends StatelessWidget {
             sizeBytes: length,
             extension: fileExt.toUpperCase(),
             category: activeTool,
-            targetFormat: '',
+            targetFormat: defaultFormat,
           ));
         }
       } catch (_) {}
@@ -226,6 +228,12 @@ class ConverterPage extends StatelessWidget {
                             onRemove: () {
                               context.read<ConverterBloc>().add(RemoveFileEvent(file.id));
                             },
+                            onTargetFormatChanged: (newFormat) {
+                              context.read<ConverterBloc>().add(UpdateFileTargetFormatEvent(
+                                id: file.id,
+                                targetFormat: newFormat,
+                              ));
+                            },
                           );
                         },
                       ),
@@ -235,37 +243,51 @@ class ConverterPage extends StatelessWidget {
                   );
 
             if (isDesktop) {
-              return SingleChildScrollView(
+              return Padding(
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   children: [
                     _buildToolTabs(context, state.activeTool, state.isConverting, localizations),
-                    const SizedBox(height: 32),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Left queue list
-                        Expanded(
-                          flex: 3,
-                          child: activeWidget,
-                        ),
-                        if (state.queue.isNotEmpty) ...[
-                          const SizedBox(width: 24),
-                          // Right settings panel
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Left queue list
                           Expanded(
-                            flex: 2,
-                            child: SettingsPanel(
-                              activeTool: state.activeTool,
-                              targetFormat: state.targetFormat,
-                              quality: state.quality,
-                              savePath: state.savePath,
-                              isConverting: state.isConverting,
-                              queueLength: state.queue.length,
-                              shouldZip: state.shouldZip,
-                            ),
+                            flex: 3,
+                            child: state.queue.isEmpty
+                                ? activeWidget
+                                : SingleChildScrollView(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(right: 16),
+                                      child: activeWidget,
+                                    ),
+                                  ),
                           ),
+                          if (state.queue.isNotEmpty) ...[
+                            const SizedBox(width: 24),
+                            // Right settings panel
+                            Expanded(
+                              flex: 2,
+                              child: SingleChildScrollView(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 16),
+                                  child: SettingsPanel(
+                                    activeTool: state.activeTool,
+                                    targetFormat: state.targetFormat,
+                                    quality: state.quality,
+                                    savePath: state.savePath,
+                                    isConverting: state.isConverting,
+                                    queueLength: state.queue.length,
+                                    shouldZip: state.shouldZip,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   ],
                 ),
@@ -281,71 +303,21 @@ class ConverterPage extends StatelessWidget {
                       _buildToolTabs(context, state.activeTool, state.isConverting, localizations),
                       const SizedBox(height: 24),
                       activeWidget,
-                      if (state.queue.isNotEmpty) ...[
-                        const SizedBox(height: 24),
-                        SettingsPanel(
-                          activeTool: state.activeTool,
-                          targetFormat: state.targetFormat,
-                          quality: state.quality,
-                          savePath: state.savePath,
-                          isConverting: state.isConverting,
-                          queueLength: state.queue.length,
-                          shouldZip: state.shouldZip,
-                          showConvertButton: false,
-                        ),
-                      ],
+                      // Bottom padding so activeWidget items are not obscured by the collapsed bottom sheet
+                      if (state.queue.isNotEmpty)
+                        const SizedBox(height: 100),
                     ],
                   ),
                 ),
                 bottomNavigationBar: state.queue.isNotEmpty && !showSuccessScreen
-                    ? Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppTheme.surface(context),
-                          border: Border(
-                            top: BorderSide(color: AppTheme.border(context)),
-                          ),
-                        ),
-                        child: SafeArea(
-                          child: SizedBox(
-                            width: double.infinity,
-                            height: 52,
-                            child: ElevatedButton.icon(
-                              onPressed: state.isConverting
-                                  ? null
-                                  : () {
-                                      context.read<ConverterBloc>().add(StartConversionEvent());
-                                    },
-                              icon: state.isConverting
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                      ),
-                                    )
-                                  : const Icon(Icons.flash_on, size: 18),
-                              label: Text(
-                                state.isConverting
-                                    ? localizations.processing
-                                    : '${localizations.convertAll} (${state.queue.length})',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppTheme.primary(context),
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                    ? ExpandableSettingsBottomSheet(
+                        activeTool: state.activeTool,
+                        targetFormat: state.targetFormat,
+                        quality: state.quality,
+                        savePath: state.savePath,
+                        isConverting: state.isConverting,
+                        queueLength: state.queue.length,
+                        shouldZip: state.shouldZip,
                       )
                     : null,
               );

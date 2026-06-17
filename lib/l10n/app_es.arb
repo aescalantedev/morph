@@ -73,5 +73,7 @@
   "share": "Compartir",
   "openFolder": "Abrir carpeta",
   "viewFile": "Ver archivo",
-  "conversionComplete": "Conversión completada"
+  "conversionComplete": "Conversión completada",
+  "supportAndHelp": "Soporte & Ayuda",
+  "visitWebsite": "Visitar Web"
 }

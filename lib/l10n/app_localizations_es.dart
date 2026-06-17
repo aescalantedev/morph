@@ -236,4 +236,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get conversionComplete => 'Conversión completada';
+
+  @override
+  String get supportAndHelp => 'Soporte & Ayuda';
+
+  @override
+  String get visitWebsite => 'Visitar Web';
 }

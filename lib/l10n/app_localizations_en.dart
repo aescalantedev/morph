@@ -235,4 +235,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get conversionComplete => 'Conversion completed';
+
+  @override
+  String get supportAndHelp => 'Support & Help';
+
+  @override
+  String get visitWebsite => 'Visit Website';
 }

@@ -39,6 +39,7 @@ class _DropzoneAreaState extends State<DropzoneArea> {
   /// Handles files dropped into the area from the OS.
   Future<void> _handleDroppedFiles(BuildContext context, List<dynamic> files) async {
     final List<MediaFile> selectedFiles = [];
+    final defaultFormat = context.read<ConverterBloc>().state.targetFormat.toLowerCase();
 
     // Category extensions maps for validation
     const imageExts = {'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'heic', 'tiff', 'svg'};
@@ -75,7 +76,7 @@ class _DropzoneAreaState extends State<DropzoneArea> {
             sizeBytes: length,
             extension: fileExt.toUpperCase(),
             category: widget.activeTool,
-            targetFormat: '',
+            targetFormat: defaultFormat,
           ));
         }
       } catch (_) {}

@@ -179,3 +179,19 @@ class ToggleMergeIntoSingleFileEvent extends ConverterEvent {
   @override
   List<Object?> get props => [merge];
 }
+
+/// Event dispatched to update the target format of a single file in the queue.
+class UpdateFileTargetFormatEvent extends ConverterEvent {
+  /// The unique identifier of the file.
+  final String id;
+
+  /// The new target format extension.
+  final String targetFormat;
+
+  /// Creates an [UpdateFileTargetFormatEvent].
+  const UpdateFileTargetFormatEvent({required this.id, required this.targetFormat});
+
+  @override
+  List<Object?> get props => [id, targetFormat];
+}
+

@@ -73,5 +73,7 @@
   "share": "Share",
   "openFolder": "Open folder",
   "viewFile": "View file",
-  "conversionComplete": "Conversion completed"
+  "conversionComplete": "Conversion completed",
+  "supportAndHelp": "Support & Help",
+  "visitWebsite": "Visit Website"
 }
