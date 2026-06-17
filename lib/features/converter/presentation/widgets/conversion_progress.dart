@@ -59,20 +59,31 @@ class ConversionProgress extends StatelessWidget {
       pathsToShare.add(generatedZipPath!);
     } else {
       // Use toSet() to avoid sharing the same merged file multiple times
-      pathsToShare.addAll(successfulConversions.map((f) => f.outputPath).whereType<String>().toSet());
+      pathsToShare.addAll(
+        successfulConversions
+            .map((f) => f.outputPath)
+            .whereType<String>()
+            .toSet(),
+      );
     }
 
     if (pathsToShare.isNotEmpty) {
       try {
         final List<XFile> xFiles = pathsToShare.map((p) => XFile(p)).toList();
-        await Share.shareXFiles(xFiles, text: 'Convertido con Morph');
+        //await Share.shareXFiles(xFiles, text: 'Convertido con Morph');
+        await SharePlus.instance.share(
+          ShareParams(files: xFiles, text: 'Convertido con Morph'),
+        );
       } catch (e) {
         debugPrint('Error sharing files: $e');
       }
     }
   }
 
-  Widget _buildZipSection(BuildContext context, AppLocalizations localizations) {
+  Widget _buildZipSection(
+    BuildContext context,
+    AppLocalizations localizations,
+  ) {
     if (generatedZipPath == null) return const SizedBox.shrink();
 
     return Container(
@@ -82,7 +93,9 @@ class ConversionProgress extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.primary(context).withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.primary(context).withValues(alpha: 0.15)),
+        border: Border.all(
+          color: AppTheme.primary(context).withValues(alpha: 0.15),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,7 +109,9 @@ class ConversionProgress extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                localizations.localeName == 'es' ? 'Archivo ZIP Creado' : 'ZIP File Created',
+                localizations.localeName == 'es'
+                    ? 'Archivo ZIP Creado'
+                    : 'ZIP File Created',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
@@ -110,9 +125,14 @@ class ConversionProgress extends StatelessWidget {
             children: [
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
-                    color: AppTheme.surfaceContainerHighest(context).withValues(alpha: 0.5),
+                    color: AppTheme.surfaceContainerHighest(
+                      context,
+                    ).withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: SelectableText(
@@ -129,14 +149,18 @@ class ConversionProgress extends StatelessWidget {
               const SizedBox(width: 8),
               IconButton(
                 icon: const Icon(Icons.open_in_new, size: 18),
-                tooltip: localizations.localeName == 'es' ? 'Abrir ZIP' : 'Open ZIP',
+                tooltip: localizations.localeName == 'es'
+                    ? 'Abrir ZIP'
+                    : 'Open ZIP',
                 onPressed: () {
                   di.sl<FileOpenerService>().openFile(generatedZipPath!);
                 },
               ),
               IconButton(
                 icon: const Icon(Icons.folder_open_outlined, size: 18),
-                tooltip: localizations.localeName == 'es' ? 'Mostrar en carpeta' : 'Show in folder',
+                tooltip: localizations.localeName == 'es'
+                    ? 'Mostrar en carpeta'
+                    : 'Show in folder',
                 onPressed: () {
                   di.sl<FileOpenerService>().openFolder(generatedZipPath!);
                 },
@@ -148,7 +172,12 @@ class ConversionProgress extends StatelessWidget {
     );
   }
 
-  Widget _buildMergedPdfItemDesktop(BuildContext context, String mergedPath, int totalSize, AppLocalizations localizations) {
+  Widget _buildMergedPdfItemDesktop(
+    BuildContext context,
+    String mergedPath,
+    int totalSize,
+    AppLocalizations localizations,
+  ) {
     final fileName = mergedPath.split(Platform.pathSeparator).last;
 
     return Container(
@@ -182,7 +211,10 @@ class ConversionProgress extends StatelessWidget {
               children: [
                 Text(
                   fileName,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -207,7 +239,11 @@ class ConversionProgress extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    Icon(Icons.arrow_forward, size: 10, color: AppTheme.onSurfaceVariant(context)),
+                    Icon(
+                      Icons.arrow_forward,
+                      size: 10,
+                      color: AppTheme.onSurfaceVariant(context),
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       'PDF',
@@ -234,14 +270,21 @@ class ConversionProgress extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.check_circle, size: 16, color: AppTheme.success(context)),
+              Icon(
+                Icons.check_circle,
+                size: 16,
+                color: AppTheme.success(context),
+              ),
               const SizedBox(width: 12),
               TextButton(
                 onPressed: () {
                   di.sl<FileOpenerService>().openFile(mergedPath);
                 },
                 style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
@@ -256,7 +299,10 @@ class ConversionProgress extends StatelessWidget {
                   di.sl<FileOpenerService>().openFolder(mergedPath);
                 },
                 style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
@@ -272,7 +318,12 @@ class ConversionProgress extends StatelessWidget {
     );
   }
 
-  Widget _buildMergedPdfItemMobile(BuildContext context, String mergedPath, int totalSize, AppLocalizations localizations) {
+  Widget _buildMergedPdfItemMobile(
+    BuildContext context,
+    String mergedPath,
+    int totalSize,
+    AppLocalizations localizations,
+  ) {
     final fileName = mergedPath.split(Platform.pathSeparator).last;
 
     return Container(
@@ -307,7 +358,10 @@ class ConversionProgress extends StatelessWidget {
                   children: [
                     Text(
                       fileName,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -352,7 +406,10 @@ class ConversionProgress extends StatelessWidget {
                   di.sl<FileOpenerService>().openFile(mergedPath);
                 },
                 icon: const Icon(Icons.open_in_new, size: 14),
-                label: Text(localizations.viewFile, style: const TextStyle(fontSize: 11)),
+                label: Text(
+                  localizations.viewFile,
+                  style: const TextStyle(fontSize: 11),
+                ),
                 style: TextButton.styleFrom(
                   visualDensity: VisualDensity.compact,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -363,7 +420,10 @@ class ConversionProgress extends StatelessWidget {
                   di.sl<FileOpenerService>().openFolder(mergedPath);
                 },
                 icon: const Icon(Icons.folder_open_outlined, size: 14),
-                label: Text(localizations.openFolder, style: const TextStyle(fontSize: 11)),
+                label: Text(
+                  localizations.openFolder,
+                  style: const TextStyle(fontSize: 11),
+                ),
                 style: TextButton.styleFrom(
                   visualDensity: VisualDensity.compact,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -376,7 +436,11 @@ class ConversionProgress extends StatelessWidget {
     );
   }
 
-  Widget _buildFileItemDesktop(BuildContext context, MediaFile file, AppLocalizations localizations) {
+  Widget _buildFileItemDesktop(
+    BuildContext context,
+    MediaFile file,
+    AppLocalizations localizations,
+  ) {
     final bool isCompleted = file.status == ConversionStatus.completed;
 
     return Container(
@@ -402,7 +466,9 @@ class ConversionProgress extends StatelessWidget {
             child: Icon(
               _getFileIcon(file.category),
               size: 18,
-              color: isCompleted ? AppTheme.success(context) : AppTheme.error(context),
+              color: isCompleted
+                  ? AppTheme.success(context)
+                  : AppTheme.error(context),
             ),
           ),
           const SizedBox(width: 12),
@@ -413,7 +479,10 @@ class ConversionProgress extends StatelessWidget {
               children: [
                 Text(
                   file.name,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -422,7 +491,10 @@ class ConversionProgress extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 2),
                     child: Text(
                       file.errorMessage!,
-                      style: TextStyle(fontSize: 11, color: AppTheme.error(context)),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppTheme.error(context),
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -450,7 +522,11 @@ class ConversionProgress extends StatelessWidget {
                     ),
                     if (isCompleted && file.targetFormat.isNotEmpty) ...[
                       const SizedBox(width: 4),
-                      Icon(Icons.arrow_forward, size: 10, color: AppTheme.onSurfaceVariant(context)),
+                      Icon(
+                        Icons.arrow_forward,
+                        size: 10,
+                        color: AppTheme.onSurfaceVariant(context),
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         file.targetFormat.toUpperCase(),
@@ -480,7 +556,11 @@ class ConversionProgress extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (isCompleted) ...[
-                Icon(Icons.check_circle, size: 16, color: AppTheme.success(context)),
+                Icon(
+                  Icons.check_circle,
+                  size: 16,
+                  color: AppTheme.success(context),
+                ),
                 const SizedBox(width: 12),
                 if (file.outputPath != null) ...[
                   TextButton(
@@ -488,7 +568,10 @@ class ConversionProgress extends StatelessWidget {
                       di.sl<FileOpenerService>().openFile(file.outputPath!);
                     },
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -503,7 +586,10 @@ class ConversionProgress extends StatelessWidget {
                       di.sl<FileOpenerService>().openFolder(file.outputPath!);
                     },
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -514,7 +600,11 @@ class ConversionProgress extends StatelessWidget {
                   ),
                 ],
               ] else ...[
-                Icon(Icons.error_outline, size: 16, color: AppTheme.error(context)),
+                Icon(
+                  Icons.error_outline,
+                  size: 16,
+                  color: AppTheme.error(context),
+                ),
               ],
             ],
           ),
@@ -523,7 +613,11 @@ class ConversionProgress extends StatelessWidget {
     );
   }
 
-  Widget _buildFileItemMobile(BuildContext context, MediaFile file, AppLocalizations localizations) {
+  Widget _buildFileItemMobile(
+    BuildContext context,
+    MediaFile file,
+    AppLocalizations localizations,
+  ) {
     final bool isCompleted = file.status == ConversionStatus.completed;
 
     return Container(
@@ -550,7 +644,9 @@ class ConversionProgress extends StatelessWidget {
                 child: Icon(
                   _getFileIcon(file.category),
                   size: 16,
-                  color: isCompleted ? AppTheme.success(context) : AppTheme.error(context),
+                  color: isCompleted
+                      ? AppTheme.success(context)
+                      : AppTheme.error(context),
                 ),
               ),
               const SizedBox(width: 12),
@@ -560,7 +656,10 @@ class ConversionProgress extends StatelessWidget {
                   children: [
                     Text(
                       file.name,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -584,7 +683,11 @@ class ConversionProgress extends StatelessWidget {
                         ),
                         if (isCompleted && file.targetFormat.isNotEmpty) ...[
                           const SizedBox(width: 4),
-                          Icon(Icons.arrow_forward, size: 9, color: AppTheme.onSurfaceVariant(context)),
+                          Icon(
+                            Icons.arrow_forward,
+                            size: 9,
+                            color: AppTheme.onSurfaceVariant(context),
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             file.targetFormat.toUpperCase(),
@@ -603,7 +706,9 @@ class ConversionProgress extends StatelessWidget {
               Icon(
                 isCompleted ? Icons.check_circle : Icons.error_outline,
                 size: 18,
-                color: isCompleted ? AppTheme.success(context) : AppTheme.error(context),
+                color: isCompleted
+                    ? AppTheme.success(context)
+                    : AppTheme.error(context),
               ),
             ],
           ),
@@ -619,7 +724,10 @@ class ConversionProgress extends StatelessWidget {
                     di.sl<FileOpenerService>().openFile(file.outputPath!);
                   },
                   icon: const Icon(Icons.open_in_new, size: 14),
-                  label: Text(localizations.viewFile, style: const TextStyle(fontSize: 11)),
+                  label: Text(
+                    localizations.viewFile,
+                    style: const TextStyle(fontSize: 11),
+                  ),
                   style: TextButton.styleFrom(
                     visualDensity: VisualDensity.compact,
                     padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -630,7 +738,10 @@ class ConversionProgress extends StatelessWidget {
                     di.sl<FileOpenerService>().openFolder(file.outputPath!);
                   },
                   icon: const Icon(Icons.folder_open_outlined, size: 14),
-                  label: Text(localizations.openFolder, style: const TextStyle(fontSize: 11)),
+                  label: Text(
+                    localizations.openFolder,
+                    style: const TextStyle(fontSize: 11),
+                  ),
                   style: TextButton.styleFrom(
                     visualDensity: VisualDensity.compact,
                     padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -661,11 +772,19 @@ class ConversionProgress extends StatelessWidget {
     );
   }
 
-  Widget _buildDesktopLayout(BuildContext context, AppLocalizations localizations) {
-    final successfulConversions = queue.where((f) => f.status == ConversionStatus.completed).toList();
-    final failedConversions = queue.where((f) => f.status == ConversionStatus.failed).toList();
+  Widget _buildDesktopLayout(
+    BuildContext context,
+    AppLocalizations localizations,
+  ) {
+    final successfulConversions = queue
+        .where((f) => f.status == ConversionStatus.completed)
+        .toList();
+    final failedConversions = queue
+        .where((f) => f.status == ConversionStatus.failed)
+        .toList();
 
-    final String? mergedPdfPath = mergeIntoSingleFile && successfulConversions.isNotEmpty
+    final String? mergedPdfPath =
+        mergeIntoSingleFile && successfulConversions.isNotEmpty
         ? successfulConversions.first.outputPath
         : null;
     int mergedPdfSize = 0;
@@ -673,7 +792,10 @@ class ConversionProgress extends StatelessWidget {
       try {
         mergedPdfSize = File(mergedPdfPath).lengthSync();
       } catch (_) {
-        mergedPdfSize = successfulConversions.fold(0, (sum, f) => sum + f.sizeBytes);
+        mergedPdfSize = successfulConversions.fold(
+          0,
+          (sum, f) => sum + f.sizeBytes,
+        );
       }
     }
 
@@ -707,7 +829,9 @@ class ConversionProgress extends StatelessWidget {
                       width: 68,
                       height: 68,
                       decoration: BoxDecoration(
-                        color: AppTheme.success(context).withValues(alpha: 0.12),
+                        color: AppTheme.success(
+                          context,
+                        ).withValues(alpha: 0.12),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -719,7 +843,8 @@ class ConversionProgress extends StatelessWidget {
                     const SizedBox(height: 20),
                     Text(
                       localizations.conversionComplete,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(
                             fontWeight: FontWeight.w600,
                             letterSpacing: -0.5,
                           ),
@@ -728,21 +853,30 @@ class ConversionProgress extends StatelessWidget {
                     Text(
                       '${successfulConversions.length} ${localizations.completed.toLowerCase()} • ${failedConversions.length} ${localizations.failed.toLowerCase()}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppTheme.onSurfaceVariant(context),
-                          ),
+                        color: AppTheme.onSurfaceVariant(context),
+                      ),
                     ),
                     const SizedBox(height: 28),
                     _buildZipSection(context, localizations),
                     // Files List
                     Flexible(
                       child: mergedPdfPath != null
-                          ? _buildMergedPdfItemDesktop(context, mergedPdfPath, mergedPdfSize, localizations)
+                          ? _buildMergedPdfItemDesktop(
+                              context,
+                              mergedPdfPath,
+                              mergedPdfSize,
+                              localizations,
+                            )
                           : ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: queue.length,
                               itemBuilder: (context, index) {
-                                return _buildFileItemDesktop(context, queue[index], localizations);
+                                return _buildFileItemDesktop(
+                                  context,
+                                  queue[index],
+                                  localizations,
+                                );
                               },
                             ),
                     ),
@@ -758,7 +892,10 @@ class ConversionProgress extends StatelessWidget {
                         icon: const Icon(Icons.add, size: 18),
                         label: Text(
                           localizations.convertAnother,
-                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primary(context),
@@ -796,11 +933,19 @@ class ConversionProgress extends StatelessWidget {
     );
   }
 
-  Widget _buildMobileLayout(BuildContext context, AppLocalizations localizations) {
-    final successfulConversions = queue.where((f) => f.status == ConversionStatus.completed).toList();
-    final failedConversions = queue.where((f) => f.status == ConversionStatus.failed).toList();
+  Widget _buildMobileLayout(
+    BuildContext context,
+    AppLocalizations localizations,
+  ) {
+    final successfulConversions = queue
+        .where((f) => f.status == ConversionStatus.completed)
+        .toList();
+    final failedConversions = queue
+        .where((f) => f.status == ConversionStatus.failed)
+        .toList();
 
-    final String? mergedPdfPath = mergeIntoSingleFile && successfulConversions.isNotEmpty
+    final String? mergedPdfPath =
+        mergeIntoSingleFile && successfulConversions.isNotEmpty
         ? successfulConversions.first.outputPath
         : null;
     int mergedPdfSize = 0;
@@ -808,7 +953,10 @@ class ConversionProgress extends StatelessWidget {
       try {
         mergedPdfSize = File(mergedPdfPath).lengthSync();
       } catch (_) {
-        mergedPdfSize = successfulConversions.fold(0, (sum, f) => sum + f.sizeBytes);
+        mergedPdfSize = successfulConversions.fold(
+          0,
+          (sum, f) => sum + f.sizeBytes,
+        );
       }
     }
 
@@ -823,10 +971,7 @@ class ConversionProgress extends StatelessWidget {
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.close),
-            onPressed: onReset,
-          ),
+          IconButton(icon: const Icon(Icons.close), onPressed: onReset),
           const SizedBox(width: 8),
         ],
       ),
@@ -855,7 +1000,10 @@ class ConversionProgress extends StatelessWidget {
                   const SizedBox(height: 16),
                   Text(
                     localizations.conversionSuccess,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -872,13 +1020,22 @@ class ConversionProgress extends StatelessWidget {
             _buildZipSection(context, localizations),
             // Files List
             mergedPdfPath != null
-                ? _buildMergedPdfItemMobile(context, mergedPdfPath, mergedPdfSize, localizations)
+                ? _buildMergedPdfItemMobile(
+                    context,
+                    mergedPdfPath,
+                    mergedPdfSize,
+                    localizations,
+                  )
                 : ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: queue.length,
                     itemBuilder: (context, index) {
-                      return _buildFileItemMobile(context, queue[index], localizations);
+                      return _buildFileItemMobile(
+                        context,
+                        queue[index],
+                        localizations,
+                      );
                     },
                   ),
             const SizedBox(height: 20),
@@ -889,9 +1046,7 @@ class ConversionProgress extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppTheme.surface(context),
-          border: Border(
-            top: BorderSide(color: AppTheme.border(context)),
-          ),
+          border: Border(top: BorderSide(color: AppTheme.border(context))),
         ),
         child: SafeArea(
           child: Column(
@@ -904,7 +1059,8 @@ class ConversionProgress extends StatelessWidget {
                   height: 50,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      final firstOutput = successfulConversions.first.outputPath;
+                      final firstOutput =
+                          successfulConversions.first.outputPath;
                       if (firstOutput != null) {
                         di.sl<FileOpenerService>().openFolder(firstOutput);
                       }
@@ -912,7 +1068,10 @@ class ConversionProgress extends StatelessWidget {
                     icon: const Icon(Icons.folder_open),
                     label: Text(
                       localizations.openFolder,
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primary(context),
@@ -935,7 +1094,10 @@ class ConversionProgress extends StatelessWidget {
                         child: OutlinedButton.icon(
                           onPressed: () => _shareFiles(successfulConversions),
                           icon: const Icon(Icons.share_outlined, size: 16),
-                          label: Text(localizations.share, style: const TextStyle(fontSize: 13)),
+                          label: Text(
+                            localizations.share,
+                            style: const TextStyle(fontSize: 13),
+                          ),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppTheme.onSurface(context),
                             side: BorderSide(color: AppTheme.border(context)),

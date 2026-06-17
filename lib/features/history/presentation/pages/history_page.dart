@@ -411,7 +411,10 @@ class _HistoryPageState extends State<HistoryPage> {
                                                 icon: const Icon(Icons.share_outlined, size: 16),
                                                 onPressed: () {
                                                   try {
-                                                    Share.shareXFiles([XFile(item.outputPath!)], text: 'Convertido con Morph');
+                                                    //Share.shareXFiles([XFile(item.outputPath!)], text: 'Convertido con Morph');
+                                                    SharePlus.instance.share(
+                                                      ShareParams(files: [XFile(item.outputPath!)], text: 'Convertido con Morph'),
+                                                    );
                                                   } catch (_) {}
                                                 },
                                                 tooltip: 'Compartir',

@@ -715,7 +715,11 @@ class _DashboardPageState extends State<DashboardPage> {
                           icon: const Icon(Icons.share_outlined, size: 14),
                           onPressed: () {
                             try {
-                              Share.shareXFiles([XFile(item.outputPath!)], text: 'Convertido con Morph');
+
+                              //Share.shareXFiles([XFile(item.outputPath!)], text: 'Convertido con Morph');
+                              SharePlus.instance.share(
+                                ShareParams(files: [XFile(item.outputPath!)], text: 'Convertido con Morph'),
+                              );
                             } catch (_) {}
                           },
                           splashRadius: 16,
