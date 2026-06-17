@@ -27,6 +27,9 @@ class ConverterState extends Equatable {
   /// Completed or failed conversions in the current session.
   final List<MediaFile> history;
 
+  /// Signals whether the conversion history has been fully loaded from storage.
+  final bool isHistoryLoaded;
+
   /// Signals if settings and folders have been initialized.
   final bool isInitialized;
 
@@ -51,6 +54,7 @@ class ConverterState extends Equatable {
     required this.savePath,
     required this.isConverting,
     required this.history,
+    this.isHistoryLoaded = false,
     this.isInitialized = false,
     this.shouldZip = false,
     this.generatedZipPath,
@@ -68,6 +72,7 @@ class ConverterState extends Equatable {
       savePath: '',
       isConverting: false,
       history: [],
+      isHistoryLoaded: false,
       isInitialized: false,
       shouldZip: false,
       generatedZipPath: null,
@@ -85,6 +90,7 @@ class ConverterState extends Equatable {
     String? savePath,
     bool? isConverting,
     List<MediaFile>? history,
+    bool? isHistoryLoaded,
     bool? isInitialized,
     bool? shouldZip,
     String? generatedZipPath,
@@ -99,6 +105,7 @@ class ConverterState extends Equatable {
       savePath: savePath ?? this.savePath,
       isConverting: isConverting ?? this.isConverting,
       history: history ?? this.history,
+      isHistoryLoaded: isHistoryLoaded ?? this.isHistoryLoaded,
       isInitialized: isInitialized ?? this.isInitialized,
       shouldZip: shouldZip ?? this.shouldZip,
       generatedZipPath: generatedZipPath ?? this.generatedZipPath,
@@ -116,6 +123,7 @@ class ConverterState extends Equatable {
         savePath,
         isConverting,
         history,
+        isHistoryLoaded,
         isInitialized,
         shouldZip,
         generatedZipPath,

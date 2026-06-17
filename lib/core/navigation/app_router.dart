@@ -5,6 +5,7 @@ import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/converter/presentation/pages/converter_page.dart';
 import '../../features/history/presentation/pages/history_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
+import '../../features/splash/presentation/pages/splash_page.dart';
 
 /// Global key for the root navigator of the application.
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -18,9 +19,13 @@ String initialLocationOverride = '/dashboard';
 /// stacks and keep-alive states for the core tabs: Dashboard, Convert, History,
 /// and Settings.
 final GoRouter appRouter = GoRouter(
-  initialLocation: initialLocationOverride,
+  initialLocation: '/',
   navigatorKey: rootNavigatorKey,
   routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const SplashPage(),
+    ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return MainShellPage(navigationShell: navigationShell);

@@ -73,6 +73,7 @@ void main() {
           languageCode: 'system',
           notificationsEnabled: true,
           windowsMenuEnabled: false,
+          isLoaded: true,
         ),
       ),
     );
@@ -97,6 +98,7 @@ void main() {
           notificationsEnabled: false,
           windowsMenuEnabled: false,
           themeColor: Color(0xFF007A87),
+          isLoaded: true,
         ),
       ),
     );
@@ -116,6 +118,7 @@ void main() {
       emits(
         SettingsState.initial().copyWith(
           themeColor: newColor,
+          isLoaded: true,
         ),
       ),
     );

@@ -472,17 +472,17 @@ class _MainShellPageState extends State<MainShellPage> {
     final localizations = AppLocalizations.of(context)!;
     final isDesktopPlatform = !kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux);
 
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final isTabletOrDesktop = constraints.maxWidth >= 640;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isTabletOrDesktop = constraints.maxWidth >= 640;
 
-          if (isTabletOrDesktop) {
-            final defaultExtended = constraints.maxWidth >= 950;
-            final isExtended = _isSidebarExtended ?? defaultExtended;
+        if (isTabletOrDesktop) {
+          final defaultExtended = constraints.maxWidth >= 950;
+          final isExtended = _isSidebarExtended ?? defaultExtended;
 
-            // Desktop & Tablet NavigationRail Layout (Sidebar starts at top y=0)
-            return Stack(
+          // Desktop & Tablet NavigationRail Layout (Sidebar starts at top y=0)
+          return Scaffold(
+            body: Stack(
               clipBehavior: Clip.none,
               children: [
                 Row(
@@ -540,79 +540,103 @@ class _MainShellPageState extends State<MainShellPage> {
                   ),
                 ),
               ],
-            );
-          } else {
-            // Mobile layout with header and Bottom Navigation Bar
-            final bool showDesktopHeader = isDesktopPlatform;
-            return Scaffold(
-              appBar: showDesktopHeader
-                  ? PreferredSize(
-                      preferredSize: const Size.fromHeight(40),
-                      child: UnifiedDesktopHeader(
-                        title: _getHeaderTitle(context, localizations),
-                      ),
-                    )
-                  : AppBar(
-                      title: Row(
-                        children: [
-                          Container(
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              color: AppTheme.primary(context),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            alignment: Alignment.center,
-                            child: const Text(
-                              'M',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white),
-                            ),
+            ),
+          );
+        } else {
+          // Mobile layout with header and Bottom Navigation Bar
+          final bool showDesktopHeader = isDesktopPlatform;
+          return Scaffold(
+            appBar: showDesktopHeader
+                ? PreferredSize(
+                    preferredSize: const Size.fromHeight(40),
+                    child: UnifiedDesktopHeader(
+                      title: _getHeaderTitle(context, localizations),
+                    ),
+                  )
+                : AppBar(
+                    title: Row(
+                      children: [
+                        Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: AppTheme.primary(context),
+                            borderRadius: BorderRadius.circular(6),
                           ),
-                          const SizedBox(width: 8),
-                          Text(localizations.appTitle, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'M',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(localizations.appTitle, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
                       actions: [
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.notifications_none),
+                        ThemeSwitcher(
+                          clipper: const ThemeSwitcherCircleClipper(),
+                          builder: (context) {
+                            return BlocBuilder<SettingsBloc, SettingsState>(
+                              builder: (blocContext, settingsState) {
+                                final isDark = settingsState.themeMode == ThemeMode.dark ||
+                                    (settingsState.themeMode == ThemeMode.system &&
+                                        MediaQuery.platformBrightnessOf(blocContext) == Brightness.dark);
+
+                                return IconButton(
+                                  onPressed: () {
+                                    final nextMode = isDark ? ThemeMode.light : ThemeMode.dark;
+                                    ThemeSwitcher.of(context).changeTheme(
+                                      theme: isDark
+                                          ? AppTheme.lightTheme(settingsState.themeColor)
+                                          : AppTheme.darkTheme(settingsState.themeColor),
+                                      isReversed: isDark,
+                                    );
+                                    blocContext.read<SettingsBloc>().add(UpdateThemeModeEvent(nextMode));
+                                  },
+                                  icon: Icon(
+                                    isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                                  ),
+                                );
+                              },
+                            );
+                          },
                         ),
                         const SizedBox(width: 8),
                       ],
-                      bottom: PreferredSize(
-                        preferredSize: const Size.fromHeight(1),
-                        child: Divider(color: AppTheme.border(context), height: 1),
-                      ),
+                    bottom: PreferredSize(
+                      preferredSize: const Size.fromHeight(1),
+                      child: Divider(color: AppTheme.border(context), height: 1),
                     ),
-              body: widget.navigationShell,
-              bottomNavigationBar: BottomNavigationBar(
-                currentIndex: widget.navigationShell.currentIndex,
-                onTap: (index) {
-                  widget.navigationShell.goBranch(index);
-                },
-                items: [
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.grid_view_outlined),
-                    label: localizations.dashboard,
                   ),
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.sync_outlined),
-                    label: localizations.convert,
-                  ),
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.history_outlined),
-                    label: localizations.history,
-                  ),
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.settings_outlined),
-                    label: localizations.settings,
-                  ),
-                ],
-              ),
-            );
-          }
-        },
-      ),
+            body: widget.navigationShell,
+            bottomNavigationBar: BottomNavigationBar(
+              currentIndex: widget.navigationShell.currentIndex,
+              onTap: (index) {
+                widget.navigationShell.goBranch(index);
+              },
+              items: [
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.grid_view_outlined),
+                  label: localizations.dashboard,
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.sync_outlined),
+                  label: localizations.convert,
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.history_outlined),
+                  label: localizations.history,
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.settings_outlined),
+                  label: localizations.settings,
+                ),
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 }

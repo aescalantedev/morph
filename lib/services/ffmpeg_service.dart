@@ -34,7 +34,7 @@ class FFmpegService {
         }
       } else {
         // Fallback to FFprobeKit FFI wrapper on mobile
-        final session = await FFprobeKit.getMediaInformation('"$normalizedPath"');
+        final session = await FFprobeKit.getMediaInformation(normalizedPath);
         final mediaInformation = session.getMediaInformation();
         if (mediaInformation != null) {
           final durationString = mediaInformation.getDuration();
@@ -225,6 +225,8 @@ class FFmpegService {
           normalizedInput,
           '-c:v',
           'libx264',
+          '-preset',
+          'ultrafast',
           '-crf',
           '$crf',
           '-c:a',
@@ -242,6 +244,10 @@ class FFmpegService {
           normalizedInput,
           '-c:v',
           'libvpx-vp9',
+          '-deadline',
+          'realtime',
+          '-cpu-used',
+          '8',
           '-b:v',
           '1M',
           '-c:a',

@@ -26,6 +26,23 @@ class _HistoryPageState extends State<HistoryPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String _selectedCategory = 'all';
+  bool _isTransitioning = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Dispatch LoadHistoryEvent to refresh or load it in case it hasn't been loaded
+    context.read<ConverterBloc>().add(const LoadHistoryEvent());
+    
+    // Defer rendering the real list to avoid first-build layout jank during tab transition
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        setState(() {
+          _isTransitioning = false;
+        });
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -253,157 +270,277 @@ class _HistoryPageState extends State<HistoryPage> {
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: AppTheme.border(context)),
                   ),
-                  child: history.isEmpty
-                      ? Center(
-                          child: Text(
-                            localizations.historyEmpty,
-                            style: TextStyle(color: AppTheme.onSurfaceVariant(context), fontSize: 13),
-                          ),
-                        )
-                      : filteredHistory.isEmpty
-                          ? Center(
-                              child: Text(
-                                'No se encontraron resultados.',
-                                style: TextStyle(color: AppTheme.onSurfaceVariant(context), fontSize: 13),
-                              ),
-                            )
-                          : ListView.separated(
-                              itemCount: filteredHistory.length,
-                              separatorBuilder: (context, index) => Divider(color: AppTheme.border(context), height: 1),
-                              itemBuilder: (context, index) {
-                                final item = filteredHistory[index];
-                                IconData itemIcon = Icons.insert_drive_file_outlined;
-                                if (item.category == 'image') {
-                                  itemIcon = Icons.image_outlined;
-                                } else if (item.category == 'video') {
-                                  itemIcon = Icons.videocam_outlined;
-                                } else if (item.category == 'audio') {
-                                  itemIcon = Icons.volume_up_outlined;
-                                }
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    child: (_isTransitioning || !state.isHistoryLoaded)
+                        ? const _HistorySkeleton(key: ValueKey('skeleton'))
+                        : history.isEmpty
+                            ? Center(
+                                key: const ValueKey('empty'),
+                                child: Text(
+                                  localizations.historyEmpty,
+                                  style: TextStyle(color: AppTheme.onSurfaceVariant(context), fontSize: 13),
+                                ),
+                              )
+                            : filteredHistory.isEmpty
+                                ? Center(
+                                    key: const ValueKey('no-results'),
+                                    child: Text(
+                                      'No se encontraron resultados.',
+                                      style: TextStyle(color: AppTheme.onSurfaceVariant(context), fontSize: 13),
+                                    ),
+                                  )
+                                : ListView.separated(
+                                    key: const ValueKey('list'),
+                                    itemCount: filteredHistory.length,
+                                    separatorBuilder: (context, index) => Divider(color: AppTheme.border(context), height: 1),
+                                    itemBuilder: (context, index) {
+                                      final item = filteredHistory[index];
+                                      IconData itemIcon = Icons.insert_drive_file_outlined;
+                                      if (item.category == 'image') {
+                                        itemIcon = Icons.image_outlined;
+                                      } else if (item.category == 'video') {
+                                        itemIcon = Icons.videocam_outlined;
+                                      } else if (item.category == 'audio') {
+                                        itemIcon = Icons.volume_up_outlined;
+                                      }
 
-                                final isCompleted = item.status == ConversionStatus.completed;
+                                      final isCompleted = item.status == ConversionStatus.completed;
 
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                                  child: Row(
-                                    children: [
-                                      Icon(itemIcon, color: AppTheme.onSurfaceVariant(context), size: 22),
-                                      const SizedBox(width: 16),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              item.name,
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w500,
-                                                color: AppTheme.onSurface(context),
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            if (item.outputPath != null) ...[
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                item.outputPath!,
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                  color: AppTheme.onSurfaceVariant(context),
-                                                  fontFamily: 'monospace',
-                                                ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ],
-                                            if (item.errorMessage != null) ...[
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                item.errorMessage!,
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                  color: AppTheme.error(context),
-                                                ),
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ],
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      // Format badge (FROM -> TO)
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: AppTheme.canvas(context),
-                                          borderRadius: BorderRadius.circular(6),
-                                          border: Border.all(color: AppTheme.border(context)),
-                                        ),
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                                         child: Row(
-                                          mainAxisSize: MainAxisSize.min,
+                                          key: ValueKey(item.id),
                                           children: [
-                                            Text(
-                                              item.extension,
-                                              style: TextStyle(
-                                                fontSize: 9,
-                                                fontFamily: 'monospace',
+                                            Icon(itemIcon, color: AppTheme.onSurfaceVariant(context), size: 22),
+                                            const SizedBox(width: 16),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    item.name,
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight: FontWeight.w500,
+                                                      color: AppTheme.onSurface(context),
+                                                    ),
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                  if (item.outputPath != null) ...[
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      item.outputPath!,
+                                                      style: TextStyle(
+                                                        fontSize: 10,
+                                                        color: AppTheme.onSurfaceVariant(context),
+                                                        fontFamily: 'monospace',
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
+                                                  if (item.errorMessage != null) ...[
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      item.errorMessage!,
+                                                      style: TextStyle(
+                                                        fontSize: 10,
+                                                        color: AppTheme.error(context),
+                                                      ),
+                                                      maxLines: 2,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
+                                                ],
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            // Format badge (FROM -> TO)
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                              decoration: BoxDecoration(
+                                                color: AppTheme.canvas(context),
+                                                borderRadius: BorderRadius.circular(6),
+                                                border: Border.all(color: AppTheme.border(context)),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    item.extension,
+                                                    style: TextStyle(
+                                                      fontSize: 9,
+                                                      fontFamily: 'monospace',
+                                                      color: AppTheme.onSurfaceVariant(context),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  Icon(Icons.arrow_right_alt, size: 10, color: AppTheme.outline(context)),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    item.targetFormat.toUpperCase(),
+                                                    style: TextStyle(
+                                                      fontSize: 9,
+                                                      fontFamily: 'monospace',
+                                                      color: AppTheme.primaryLight(context),
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            const SizedBox(width: 16),
+                                            _buildStatusBadge(context, item.status, localizations),
+                                            if (isCompleted && item.outputPath != null) ...[
+                                              const SizedBox(width: 16),
+                                              IconButton(
+                                                icon: const Icon(Icons.open_in_new, size: 16),
+                                                onPressed: () {
+                                                  di.sl<FileOpenerService>().openFile(item.outputPath!);
+                                                },
+                                                tooltip: 'Abrir archivo',
+                                                splashRadius: 20,
+                                                constraints: const BoxConstraints(),
+                                                padding: EdgeInsets.zero,
+                                                color: AppTheme.primary(context),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              IconButton(
+                                                icon: const Icon(Icons.share_outlined, size: 16),
+                                                onPressed: () {
+                                                  try {
+                                                    Share.shareXFiles([XFile(item.outputPath!)], text: 'Convertido con Morph');
+                                                  } catch (_) {}
+                                                },
+                                                tooltip: 'Compartir',
+                                                splashRadius: 20,
+                                                constraints: const BoxConstraints(),
+                                                padding: EdgeInsets.zero,
                                                 color: AppTheme.onSurfaceVariant(context),
                                               ),
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Icon(Icons.arrow_right_alt, size: 10, color: AppTheme.outline(context)),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              item.targetFormat.toUpperCase(),
-                                              style: TextStyle(
-                                                fontSize: 9,
-                                                fontFamily: 'monospace',
-                                                color: AppTheme.primaryLight(context),
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
+                                            ],
                                           ],
                                         ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      _buildStatusBadge(context, item.status, localizations),
-                                      if (isCompleted && item.outputPath != null) ...[
-                                        const SizedBox(width: 16),
-                                        IconButton(
-                                          icon: const Icon(Icons.open_in_new, size: 16),
-                                          onPressed: () {
-                                            di.sl<FileOpenerService>().openFile(item.outputPath!);
-                                          },
-                                          tooltip: 'Abrir archivo',
-                                          splashRadius: 20,
-                                          constraints: const BoxConstraints(),
-                                          padding: EdgeInsets.zero,
-                                          color: AppTheme.primary(context),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        IconButton(
-                                          icon: const Icon(Icons.share_outlined, size: 16),
-                                          onPressed: () {
-                                            try {
-                                              Share.shareXFiles([XFile(item.outputPath!)], text: 'Convertido con Morph');
-                                            } catch (_) {}
-                                          },
-                                          tooltip: 'Compartir',
-                                          splashRadius: 20,
-                                          constraints: const BoxConstraints(),
-                                          padding: EdgeInsets.zero,
-                                          color: AppTheme.onSurfaceVariant(context),
-                                        ),
-                                      ],
-                                    ],
+                                      );
+                                    },
                                   ),
-                                );
-                              },
-                            ),
+                  ),
                 ),
               ),
             ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// A premium pulsating skeleton loader for History items to prevent first-build jank.
+class _HistorySkeleton extends StatefulWidget {
+  const _HistorySkeleton({super.key});
+
+  @override
+  State<_HistorySkeleton> createState() => _HistorySkeletonState();
+}
+
+class _HistorySkeletonState extends State<_HistorySkeleton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    )..repeat(reverse: true);
+    _animation = Tween<double>(begin: 0.35, end: 0.75).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Opacity(
+          opacity: _animation.value,
+          child: ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 5,
+            separatorBuilder: (context, index) => Divider(color: AppTheme.border(context), height: 1),
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: Row(
+                  children: [
+                    // Icon Placeholder
+                    Container(
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        color: AppTheme.onSurfaceVariant(context).withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    // Title and Subtitle placeholders
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 140,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: AppTheme.onSurfaceVariant(context).withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            width: 200,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: AppTheme.onSurfaceVariant(context).withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Format badge placeholder
+                    Container(
+                      width: 65,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: AppTheme.onSurfaceVariant(context).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    // Status Badge Placeholder
+                    Container(
+                      width: 70,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        color: AppTheme.onSurfaceVariant(context).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         );
       },

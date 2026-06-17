@@ -18,6 +18,9 @@ class SettingsState extends Equatable {
   /// The seed color used to dynamically generate the Material 3 ColorScheme.
   final Color themeColor;
 
+  /// Indicates whether the settings have been successfully loaded from storage.
+  final bool isLoaded;
+
   /// Creates a [SettingsState] instance.
   const SettingsState({
     required this.themeMode,
@@ -25,6 +28,7 @@ class SettingsState extends Equatable {
     required this.notificationsEnabled,
     required this.windowsMenuEnabled,
     required this.themeColor,
+    required this.isLoaded,
   });
 
   /// The initial settings state on application launch.
@@ -35,6 +39,7 @@ class SettingsState extends Equatable {
       notificationsEnabled: true,
       windowsMenuEnabled: false,
       themeColor: Color(0xFF24389C),
+      isLoaded: false,
     );
   }
 
@@ -58,6 +63,7 @@ class SettingsState extends Equatable {
     bool? notificationsEnabled,
     bool? windowsMenuEnabled,
     Color? themeColor,
+    bool? isLoaded,
   }) {
     return SettingsState(
       themeMode: themeMode ?? this.themeMode,
@@ -65,6 +71,7 @@ class SettingsState extends Equatable {
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       windowsMenuEnabled: windowsMenuEnabled ?? this.windowsMenuEnabled,
       themeColor: themeColor ?? this.themeColor,
+      isLoaded: isLoaded ?? this.isLoaded,
     );
   }
 
@@ -75,5 +82,6 @@ class SettingsState extends Equatable {
         notificationsEnabled,
         windowsMenuEnabled,
         themeColor,
+        isLoaded,
       ];
 }

@@ -70,6 +70,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       notificationsEnabled: notificationsEnabled,
       windowsMenuEnabled: windowsMenuEnabled,
       themeColor: themeColor,
+      isLoaded: true,
     ));
   }
 

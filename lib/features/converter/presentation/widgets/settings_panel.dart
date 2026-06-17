@@ -404,7 +404,10 @@ class SettingsPanel extends StatelessWidget {
     if (hideContainerBackground) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: content,
+        child: Material(
+          color: Colors.transparent,
+          child: content,
+        ),
       );
     }
 
@@ -415,7 +418,10 @@ class SettingsPanel extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppTheme.border(context)),
       ),
-      child: content,
+      child: Material(
+        color: Colors.transparent,
+        child: content,
+      ),
     );
   }
 }

@@ -89,6 +89,13 @@ void main(List<String> args) async {
       // Safely catch launch argument parsing issues
     }
   }
+  // Pre-load settings before running the app to ensure correct initial theme
+  final settingsBloc = di.sl<SettingsBloc>();
+  settingsBloc.add(const LoadSettingsEvent());
+  await settingsBloc.stream.firstWhere((state) => state.isLoaded).timeout(
+    const Duration(seconds: 2),
+    onTimeout: () => settingsBloc.state,
+  );
 
   runApp(const MyApp());
 }
@@ -97,10 +104,15 @@ void main(List<String> args) async {
 ///
 /// Sets up the global BLoC providers (ConverterBloc and SettingsBloc),
 /// listens to theme/locale changes, and declares the router configuration using GoRouter.
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   /// Creates the [MyApp] widget.
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -118,10 +130,16 @@ class MyApp extends StatelessWidget {
           },
         ),
         BlocProvider<SettingsBloc>(
-          create: (context) => di.sl<SettingsBloc>()..add(const LoadSettingsEvent()),
+          create: (context) => di.sl<SettingsBloc>(),
         ),
       ],
       child: BlocBuilder<SettingsBloc, SettingsState>(
+        buildWhen: (previous, current) {
+          // Rebuild root MaterialApp when settings are first loaded
+          if (!previous.isLoaded && current.isLoaded) return true;
+          // Rebuild if the language/locale changes
+          return previous.languageCode != current.languageCode;
+        },
         builder: (context, settingsState) {
           // Determine dynamically if dark theme is active to update static AppTheme helpers
           final isSystemDark = PlatformDispatcher.instance.platformBrightness == Brightness.dark;
@@ -178,3 +196,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+

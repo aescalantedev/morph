@@ -84,7 +84,10 @@ void main() {
     await expectLater(
       converterBloc.stream,
       emits(
-        converterBloc.state.copyWith(history: [mockFile]),
+        converterBloc.state.copyWith(
+          history: [mockFile],
+          isHistoryLoaded: true,
+        ),
       ),
     );
   });

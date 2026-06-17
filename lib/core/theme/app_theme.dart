@@ -210,48 +210,48 @@ class AppTheme {
       brightness: Brightness.dark,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: colorScheme.surface,
-      // cardTheme: CardThemeData(
-      //   color: colorScheme.surfaceContainerLowest,
-      //   elevation: 0,
-      //   shape: RoundedRectangleBorder(
-      //     borderRadius: BorderRadius.circular(16),
-      //     side: BorderSide(color: colorScheme.outlineVariant, width: 1),
-      //   ),
-      // ),
-      // appBarTheme: AppBarTheme(
-      //   backgroundColor: colorScheme.surface,
-      //   elevation: 0,
-      //   scrolledUnderElevation: 0,
-      //   centerTitle: false,
-      //   iconTheme: IconThemeData(color: colorScheme.onSurface),
-      //   titleTextStyle: TextStyle(
-      //     fontSize: 20,
-      //     fontWeight: FontWeight.w600,
-      //     color: colorScheme.onSurface,
-      //     fontFamily: 'Inter',
-      //   ),
-      // ),
-      // navigationRailTheme: NavigationRailThemeData(
-      //   backgroundColor: colorScheme.surface,
-      //   selectedIconTheme: IconThemeData(color: colorScheme.primary),
-      //   unselectedIconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
-      //   selectedLabelTextStyle: TextStyle(
-      //     color: colorScheme.primary,
-      //     fontWeight: FontWeight.w600,
-      //     fontFamily: 'Inter',
-      //   ),
-      //   unselectedLabelTextStyle: TextStyle(
-      //     color: colorScheme.onSurfaceVariant,
-      //     fontFamily: 'Inter',
-      //   ),
-      // ),
-      // bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      //   backgroundColor: colorScheme.surface,
-      //   selectedItemColor: colorScheme.primary,
-      //   unselectedItemColor: colorScheme.onSurfaceVariant,
-      //   type: BottomNavigationBarType.fixed,
-      //   elevation: 8,
-      // ),
+      cardTheme: CardThemeData(
+        color: colorScheme.surfaceContainerLowest,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: colorScheme.outlineVariant, width: 1),
+        ),
+      ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: colorScheme.surface,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
+        titleTextStyle: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: colorScheme.onSurface,
+          fontFamily: 'Inter',
+        ),
+      ),
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: colorScheme.surface,
+        selectedIconTheme: IconThemeData(color: colorScheme.primary),
+        unselectedIconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
+        selectedLabelTextStyle: TextStyle(
+          color: colorScheme.primary,
+          fontWeight: FontWeight.w600,
+          fontFamily: 'Inter',
+        ),
+        unselectedLabelTextStyle: TextStyle(
+          color: colorScheme.onSurfaceVariant,
+          fontFamily: 'Inter',
+        ),
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: colorScheme.surface,
+        selectedItemColor: colorScheme.primary,
+        unselectedItemColor: colorScheme.onSurfaceVariant,
+        type: BottomNavigationBarType.fixed,
+        elevation: 8,
+      ),
       textTheme: TextTheme(
         titleLarge: TextStyle(
           fontWeight: FontWeight.w600,

@@ -468,8 +468,12 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
 
   /// Event handler for loading persisted history from local storage.
   Future<void> _onLoadHistory(LoadHistoryEvent event, Emitter<ConverterState> emit) async {
+    if (state.isHistoryLoaded) return;
     final history = await historyStorage.readHistory();
-    emit(state.copyWith(history: history));
+    emit(state.copyWith(
+      history: history,
+      isHistoryLoaded: true,
+    ));
   }
 
   /// Event handler for clearing conversion history in the state and storage.
