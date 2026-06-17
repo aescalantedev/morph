@@ -54,7 +54,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Future<void> _pickFile() async {
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.pickFiles(
         allowMultiple: false,
       );
       if (result != null && result.files.isNotEmpty) {

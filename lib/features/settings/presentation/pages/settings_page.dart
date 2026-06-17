@@ -25,7 +25,7 @@ class SettingsPage extends StatelessWidget {
   /// Opens the native directory chooser to select default output folders.
   Future<void> _selectDirectory(BuildContext context) async {
     try {
-      final selectedDirectory = await FilePicker.platform.getDirectoryPath();
+      final selectedDirectory = await FilePicker.getDirectoryPath();
       if (selectedDirectory != null && context.mounted) {
         context.read<ConverterBloc>().add(ChangeSavePathEvent(selectedDirectory));
       }

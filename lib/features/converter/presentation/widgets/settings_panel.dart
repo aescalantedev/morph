@@ -59,7 +59,7 @@ class SettingsPanel extends StatelessWidget {
   Future<void> _selectDirectory(BuildContext context) async {
     if (isConverting) return;
     try {
-      final selectedDirectory = await FilePicker.platform.getDirectoryPath();
+      final selectedDirectory = await FilePicker.getDirectoryPath();
       if (selectedDirectory != null && context.mounted) {
         context.read<ConverterBloc>().add(ChangeSavePathEvent(selectedDirectory));
       }
