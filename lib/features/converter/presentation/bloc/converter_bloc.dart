@@ -206,10 +206,25 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
 
     // Find the file that transitioned
     final fileInQueue = state.queue.firstWhere((f) => f.id == event.id);
+    final fileTargetFormat = fileInQueue.targetFormat.isNotEmpty ? fileInQueue.targetFormat.toLowerCase() : state.targetFormat.toLowerCase();
+
+    // Map target format to category for completed history items
+    String finalCategory = fileInQueue.category;
+    if (event.status == ConversionStatus.completed) {
+      if (AppConstants.audioFormats.contains(fileTargetFormat)) {
+        finalCategory = 'audio';
+      } else if (AppConstants.imageFormats.contains(fileTargetFormat)) {
+        finalCategory = 'image';
+      } else {
+        finalCategory = 'video';
+      }
+    }
+
     final updatedFile = fileInQueue.copyWith(
       status: event.status,
       outputPath: event.outputPath,
       errorMessage: event.errorMessage,
+      category: finalCategory,
       progress: event.status == ConversionStatus.completed ? 1.0 : fileInQueue.progress,
     );
 

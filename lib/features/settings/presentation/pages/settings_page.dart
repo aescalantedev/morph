@@ -12,7 +12,6 @@ import '../bloc/settings_bloc.dart';
 import '../bloc/settings_event.dart';
 import '../bloc/settings_state.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 
 /// The page containing user preferences (appearance, language, notification controls)
 /// and technical details about the conversion engine.
@@ -72,64 +71,40 @@ class SettingsPage extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              ThemeSwitcher(
-                clipper: const ThemeSwitcherCircleClipper(),
-                builder: (switcherContext) => _buildSegmentedButton(
-                  context: context,
-                  label: localizations.themeLight,
-                  icon: Icons.light_mode_outlined,
-                  isSelected: settingsState.themeMode == ThemeMode.light,
-                  onTap: () {
-                    if (settingsState.themeMode != ThemeMode.light) {
-                      ThemeSwitcher.of(switcherContext).changeTheme(
-                        theme: AppTheme.lightTheme(settingsState.themeColor),
-                        isReversed: false,
-                      );
-                      context.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.light));
-                    }
-                  },
-                ),
+              _buildSegmentedButton(
+                context: context,
+                label: localizations.themeLight,
+                icon: Icons.light_mode_outlined,
+                isSelected: settingsState.themeMode == ThemeMode.light,
+                onTap: () {
+                  if (settingsState.themeMode != ThemeMode.light) {
+                    context.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.light));
+                  }
+                },
               ),
               const SizedBox(width: 8),
-              ThemeSwitcher(
-                clipper: const ThemeSwitcherCircleClipper(),
-                builder: (switcherContext) => _buildSegmentedButton(
-                  context: context,
-                  label: localizations.themeDark,
-                  icon: Icons.dark_mode_outlined,
-                  isSelected: settingsState.themeMode == ThemeMode.dark,
-                  onTap: () {
-                    if (settingsState.themeMode != ThemeMode.dark) {
-                      ThemeSwitcher.of(switcherContext).changeTheme(
-                        theme: AppTheme.darkTheme(settingsState.themeColor),
-                        isReversed: true,
-                      );
-                      context.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.dark));
-                    }
-                  },
-                ),
+              _buildSegmentedButton(
+                context: context,
+                label: localizations.themeDark,
+                icon: Icons.dark_mode_outlined,
+                isSelected: settingsState.themeMode == ThemeMode.dark,
+                onTap: () {
+                  if (settingsState.themeMode != ThemeMode.dark) {
+                    context.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.dark));
+                  }
+                },
               ),
               const SizedBox(width: 8),
-              ThemeSwitcher(
-                clipper: const ThemeSwitcherCircleClipper(),
-                builder: (switcherContext) => _buildSegmentedButton(
-                  context: context,
-                  label: localizations.themeSystem,
-                  icon: Icons.settings_brightness_outlined,
-                  isSelected: settingsState.themeMode == ThemeMode.system,
-                  onTap: () {
-                    if (settingsState.themeMode != ThemeMode.system) {
-                      final isSystemDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
-                      ThemeSwitcher.of(switcherContext).changeTheme(
-                        theme: isSystemDark
-                            ? AppTheme.darkTheme(settingsState.themeColor)
-                            : AppTheme.lightTheme(settingsState.themeColor),
-                        isReversed: isSystemDark,
-                      );
-                      context.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.system));
-                    }
-                  },
-                ),
+              _buildSegmentedButton(
+                context: context,
+                label: localizations.themeSystem,
+                icon: Icons.settings_brightness_outlined,
+                isSelected: settingsState.themeMode == ThemeMode.system,
+                onTap: () {
+                  if (settingsState.themeMode != ThemeMode.system) {
+                    context.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.system));
+                  }
+                },
               ),
             ],
           ),
@@ -401,7 +376,6 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  /// Builds a selectable circle representing a theme seed color.
   Widget _buildColorOption(
     BuildContext context,
     Color color,
@@ -409,59 +383,49 @@ class SettingsPage extends StatelessWidget {
     String tooltip,
   ) {
     final isSelected = color.toARGB32() == selectedColor.toARGB32();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Tooltip(
       message: tooltip,
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
-        child: ThemeSwitcher(
-          clipper: const ThemeSwitcherCircleClipper(),
-          builder: (switcherContext) {
-            return GestureDetector(
-              onTap: () {
-                if (!isSelected) {
-                  final isDark = Theme.of(switcherContext).brightness == Brightness.dark;
-                  final newTheme = isDark
-                      ? AppTheme.darkTheme(color)
-                      : AppTheme.lightTheme(color);
-                  ThemeSwitcher.of(switcherContext).changeTheme(theme: newTheme);
-                  context.read<SettingsBloc>().add(UpdateThemeColorEvent(color));
-                }
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: isSelected
-                        ? (Theme.of(switcherContext).brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.black87)
-                        : Colors.transparent,
-                    width: 3,
-                  ),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: color.withValues(alpha: 0.4),
-                            blurRadius: 8,
-                            spreadRadius: 2,
-                          )
-                        ]
-                      : null,
-                ),
-                child: isSelected
-                    ? const Icon(
-                        Icons.check,
-                        color: Colors.white,
-                        size: 18,
-                      )
-                    : null,
-              ),
-            );
+        child: GestureDetector(
+          onTap: () {
+            if (!isSelected) {
+              context.read<SettingsBloc>().add(UpdateThemeColorEvent(color));
+            }
           },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isSelected
+                    ? (isDark ? Colors.white : Colors.black87)
+                    : Colors.transparent,
+                width: 3,
+              ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: color.withValues(alpha: 0.4),
+                        blurRadius: 8,
+                        spreadRadius: 2,
+                      )
+                    ]
+                  : null,
+            ),
+            child: isSelected
+                ? const Icon(
+                    Icons.check,
+                    color: Colors.white,
+                    size: 18,
+                  )
+                : null,
+          ),
         ),
       ),
     );

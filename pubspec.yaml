@@ -60,12 +60,13 @@ dependencies:
   window_manager: ^0.5.1
   desktop_drop: ^0.7.1
   url_launcher: ^6.3.2
-  animated_theme_switcher: 2.0.10
   share_plus: ^12.0.2
+  flutter_svg: ^2.0.10
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -80,11 +81,10 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   generate: true
-
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
+  assets:
+    - assets/images/logo.png
+    - assets/images/logo.svg
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -116,3 +116,17 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  image_path: "assets/images/logo.png"
+  android: "launcher_icon"
+  ios: true
+  remove_alpha_ios: true
+  min_sdk_android: 21
+  windows:
+    generate: true
+    image_path: "assets/images/logo.png"
+    icon_size: 256
+  macos:
+    generate: true
+    image_path: "assets/images/logo.png"

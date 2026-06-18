@@ -146,7 +146,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get systemLanguage => 'Por defecto del sistema';
 
   @override
-  String get notifications => 'Notificaciones de escritorio';
+  String get notifications => 'Mostrar notificaciones';
 
   @override
   String get notificationsDesc =>

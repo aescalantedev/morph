@@ -371,7 +371,7 @@ abstract class AppLocalizations {
   /// No description provided for @notifications.
   ///
   /// In es, this message translates to:
-  /// **'Notificaciones de escritorio'**
+  /// **'Mostrar notificaciones'**
   String get notifications;
 
   /// No description provided for @notificationsDesc.

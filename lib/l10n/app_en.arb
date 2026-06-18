@@ -45,7 +45,7 @@
   "themeDark": "Dark",
   "themeSystem": "System",
   "systemLanguage": "System default",
-  "notifications": "Desktop notifications",
+  "notifications": "Show notifications",
   "notificationsDesc": "Show alerts when background conversions complete",
   "defaultOutputPath": "Default output path",
   "systemInfo": "System Information",

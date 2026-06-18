@@ -6,11 +6,11 @@ import 'package:go_router/go_router.dart';
 import 'package:morph/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../shared/presentation/widgets/unified_desktop_header.dart';
+import '../../../shared/presentation/widgets/app_logo.dart';
 import '../../../settings/presentation/bloc/settings_bloc.dart';
 import '../../../settings/presentation/bloc/settings_state.dart';
 import '../../../settings/presentation/bloc/settings_event.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 
 /// The primary shell page that provides a responsive layout for the application.
 ///
@@ -142,19 +142,7 @@ class _MainShellPageState extends State<MainShellPage> {
               child: Row(
                 children: [
                   // Logo Block
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: AppTheme.primary(context),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'M',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
-                    ),
-                  ),
+                  const AppLogo(size: 28),
                   const SizedBox(width: 12),
                   // App Title
                   Text(
@@ -174,19 +162,7 @@ class _MainShellPageState extends State<MainShellPage> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 18),
               child: Center(
-                child: Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: AppTheme.primary(context),
-                    borderRadius: BorderRadius.circular(8),
-                    ),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'M',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
-                  ),
-                ),
+                child: const AppLogo(size: 28),
               ),
             ),
           ],
@@ -277,174 +253,155 @@ class _MainShellPageState extends State<MainShellPage> {
           // Theme Toggle at bottom of sidebar (Brainwave style)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            child: ThemeSwitcher(
-              clipper: const ThemeSwitcherCircleClipper(),
-              builder: (context) {
-                return BlocBuilder<SettingsBloc, SettingsState>(
-                  builder: (blocContext, settingsState) {
-                    final isDark = settingsState.themeMode == ThemeMode.dark ||
-                        (settingsState.themeMode == ThemeMode.system &&
-                            MediaQuery.platformBrightnessOf(blocContext) == Brightness.dark);
+            child: BlocBuilder<SettingsBloc, SettingsState>(
+              builder: (blocContext, settingsState) {
+                final isDark = settingsState.themeMode == ThemeMode.dark ||
+                    (settingsState.themeMode == ThemeMode.system &&
+                        MediaQuery.platformBrightnessOf(blocContext) == Brightness.dark);
 
-                    if (isExtended) {
-                      // Expanded mode: pill switch
-                      return Container(
-                        height: 38,
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          color: AppTheme.surfaceContainerLow(blocContext),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: AppTheme.border(blocContext)),
-                        ),
-                        child: Row(
-                          children: [
-                            // Light Mode Option
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  if (isDark) {
-                                    ThemeSwitcher.of(context).changeTheme(
-                                      theme: AppTheme.lightTheme(settingsState.themeColor),
-                                      isReversed: false,
-                                    );
-                                    blocContext.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.light));
-                                  }
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
+                if (isExtended) {
+                  // Expanded mode: pill switch
+                  return Container(
+                    height: 38,
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceContainerLow(blocContext),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppTheme.border(blocContext)),
+                    ),
+                    child: Row(
+                      children: [
+                        // Light Mode Option
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              if (isDark) {
+                                blocContext.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.light));
+                              }
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: !isDark
+                                    ? AppTheme.surface(blocContext)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: !isDark
+                                    ? [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.05),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        )
+                                      ]
+                                    : null,
+                              ),
+                              alignment: Alignment.center,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.light_mode_outlined,
+                                    size: 15,
                                     color: !isDark
-                                        ? AppTheme.surface(blocContext)
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: !isDark
-                                        ? [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.05),
-                                              blurRadius: 4,
-                                              offset: const Offset(0, 2),
-                                            )
-                                          ]
-                                        : null,
+                                        ? AppTheme.primary(blocContext)
+                                        : AppTheme.onSurfaceVariant(blocContext),
                                   ),
-                                  alignment: Alignment.center,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.light_mode_outlined,
-                                        size: 15,
-                                        color: !isDark
-                                            ? AppTheme.primary(blocContext)
-                                            : AppTheme.onSurfaceVariant(blocContext),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        'Claro',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: !isDark ? FontWeight.w600 : FontWeight.normal,
-                                          color: !isDark
-                                              ? AppTheme.primary(blocContext)
-                                              : AppTheme.onSurfaceVariant(blocContext),
-                                          fontFamily: 'Inter',
-                                        ),
-                                      ),
-                                    ],
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Claro',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: !isDark ? FontWeight.w600 : FontWeight.normal,
+                                      color: !isDark
+                                          ? AppTheme.primary(blocContext)
+                                          : AppTheme.onSurfaceVariant(blocContext),
+                                      fontFamily: 'Inter',
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
-                            // Dark Mode Option
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  if (!isDark) {
-                                    ThemeSwitcher.of(context).changeTheme(
-                                      theme: AppTheme.darkTheme(settingsState.themeColor),
-                                      isReversed: true,
-                                    );
-                                    blocContext.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.dark));
-                                  }
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
+                          ),
+                        ),
+                        // Dark Mode Option
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              if (!isDark) {
+                                blocContext.read<SettingsBloc>().add(const UpdateThemeModeEvent(ThemeMode.dark));
+                              }
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? AppTheme.surface(blocContext)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: isDark
+                                    ? [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.05),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        )
+                                      ]
+                                    : null,
+                              ),
+                              alignment: Alignment.center,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.dark_mode_outlined,
+                                    size: 15,
                                     color: isDark
-                                        ? AppTheme.surface(blocContext)
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: isDark
-                                        ? [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.05),
-                                              blurRadius: 4,
-                                              offset: const Offset(0, 2),
-                                            )
-                                          ]
-                                        : null,
+                                        ? AppTheme.primaryLight(blocContext)
+                                        : AppTheme.onSurfaceVariant(blocContext),
                                   ),
-                                  alignment: Alignment.center,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.dark_mode_outlined,
-                                        size: 15,
-                                        color: isDark
-                                            ? AppTheme.primaryLight(blocContext)
-                                            : AppTheme.onSurfaceVariant(blocContext),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        'Oscuro',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: isDark ? FontWeight.w600 : FontWeight.normal,
-                                          color: isDark
-                                              ? AppTheme.primaryLight(blocContext)
-                                              : AppTheme.onSurfaceVariant(blocContext),
-                                          fontFamily: 'Inter',
-                                        ),
-                                      ),
-                                    ],
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Oscuro',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: isDark ? FontWeight.w600 : FontWeight.normal,
+                                      color: isDark
+                                          ? AppTheme.primaryLight(blocContext)
+                                          : AppTheme.onSurfaceVariant(blocContext),
+                                      fontFamily: 'Inter',
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      );
-                    } else {
-                      // Collapsed mode: single circular toggle button
-                      return InkWell(
-                        onTap: () {
-                          final nextMode = isDark ? ThemeMode.light : ThemeMode.dark;
-                          ThemeSwitcher.of(context).changeTheme(
-                            theme: isDark
-                                ? AppTheme.lightTheme(settingsState.themeColor)
-                                : AppTheme.darkTheme(settingsState.themeColor),
-                            isReversed: isDark,
-                          );
-                          blocContext.read<SettingsBloc>().add(UpdateThemeModeEvent(nextMode));
-                        },
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: AppTheme.surfaceContainerLow(blocContext),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: AppTheme.border(blocContext)),
-                          ),
-                          child: Icon(
-                            isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-                            size: 18,
-                            color: AppTheme.onSurfaceVariant(blocContext),
                           ),
                         ),
-                      );
-                    }
-                  },
-                );
+                      ],
+                    ),
+                  );
+                } else {
+                  // Collapsed mode: single circular toggle button
+                  return InkWell(
+                    onTap: () {
+                      final nextMode = isDark ? ThemeMode.light : ThemeMode.dark;
+                      blocContext.read<SettingsBloc>().add(UpdateThemeModeEvent(nextMode));
+                    },
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: AppTheme.surfaceContainerLow(blocContext),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppTheme.border(blocContext)),
+                      ),
+                      child: Icon(
+                        isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                        size: 18,
+                        color: AppTheme.onSurfaceVariant(blocContext),
+                      ),
+                    ),
+                  );
+                }
               },
             ),
           ),
@@ -574,31 +531,20 @@ class _MainShellPageState extends State<MainShellPage> {
                       ],
                     ),
                       actions: [
-                        ThemeSwitcher(
-                          clipper: const ThemeSwitcherCircleClipper(),
-                          builder: (context) {
-                            return BlocBuilder<SettingsBloc, SettingsState>(
-                              builder: (blocContext, settingsState) {
-                                final isDark = settingsState.themeMode == ThemeMode.dark ||
-                                    (settingsState.themeMode == ThemeMode.system &&
-                                        MediaQuery.platformBrightnessOf(blocContext) == Brightness.dark);
+                        BlocBuilder<SettingsBloc, SettingsState>(
+                          builder: (blocContext, settingsState) {
+                            final isDark = settingsState.themeMode == ThemeMode.dark ||
+                                (settingsState.themeMode == ThemeMode.system &&
+                                    MediaQuery.platformBrightnessOf(blocContext) == Brightness.dark);
 
-                                return IconButton(
-                                  onPressed: () {
-                                    final nextMode = isDark ? ThemeMode.light : ThemeMode.dark;
-                                    ThemeSwitcher.of(context).changeTheme(
-                                      theme: isDark
-                                          ? AppTheme.lightTheme(settingsState.themeColor)
-                                          : AppTheme.darkTheme(settingsState.themeColor),
-                                      isReversed: isDark,
-                                    );
-                                    blocContext.read<SettingsBloc>().add(UpdateThemeModeEvent(nextMode));
-                                  },
-                                  icon: Icon(
-                                    isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-                                  ),
-                                );
+                            return IconButton(
+                              onPressed: () {
+                                final nextMode = isDark ? ThemeMode.light : ThemeMode.dark;
+                                blocContext.read<SettingsBloc>().add(UpdateThemeModeEvent(nextMode));
                               },
+                              icon: Icon(
+                                isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                              ),
                             );
                           },
                         ),

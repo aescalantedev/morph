@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:morph/l10n/app_localizations.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 
 import 'core/di/injection_container.dart' as di;
 import 'core/navigation/app_router.dart';
@@ -135,10 +134,9 @@ class _MyAppState extends State<MyApp> {
       ],
       child: BlocBuilder<SettingsBloc, SettingsState>(
         buildWhen: (previous, current) {
-          // Rebuild root MaterialApp when settings are first loaded
-          if (!previous.isLoaded && current.isLoaded) return true;
-          // Rebuild if the language/locale changes
-          return previous.languageCode != current.languageCode;
+          return previous.themeMode != current.themeMode ||
+              previous.themeColor != current.themeColor ||
+              previous.languageCode != current.languageCode;
         },
         builder: (context, settingsState) {
           // Determine dynamically if dark theme is active to update static AppTheme helpers
@@ -147,48 +145,38 @@ class _MyAppState extends State<MyApp> {
               (settingsState.themeMode == ThemeMode.system && isSystemDark);
           AppTheme.isDark = isDark;
 
-          final initTheme = isDark
-              ? AppTheme.darkTheme(settingsState.themeColor)
-              : AppTheme.lightTheme(settingsState.themeColor);
-
-          return ThemeProvider(
-            initTheme: initTheme,
-            builder: (context, theme) {
-              return MaterialApp.router(
-                title: 'Morph',
-                debugShowCheckedModeBanner: false,
-                theme: theme,
-                locale: settingsState.locale,
-                routerConfig: appRouter,
-                builder: (context, child) {
-                  return ThemeSwitchingArea(
-                    child: child ?? const SizedBox(),
-                  );
-                },
-                localizationsDelegates: const [
-                  AppLocalizations.delegate,
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                supportedLocales: const [
-                  Locale('es', ''), // Spanish
-                  Locale('en', ''), // English
-                ],
-                localeResolutionCallback: (locale, supportedLocales) {
-                  if (settingsState.locale != null) {
-                    return settingsState.locale;
+          return MaterialApp.router(
+            title: 'Morph',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme(settingsState.themeColor),
+            darkTheme: AppTheme.darkTheme(settingsState.themeColor),
+            themeMode: settingsState.themeMode,
+            locale: settingsState.locale,
+            routerConfig: appRouter,
+            themeAnimationDuration: const Duration(milliseconds: 350),
+            themeAnimationCurve: Curves.easeInOut,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('es', ''), // Spanish
+              Locale('en', ''), // English
+            ],
+            localeResolutionCallback: (locale, supportedLocales) {
+              if (settingsState.locale != null) {
+                return settingsState.locale;
+              }
+              if (locale != null) {
+                for (var supportedLocale in supportedLocales) {
+                  if (supportedLocale.languageCode == locale.languageCode) {
+                    return supportedLocale;
                   }
-                  if (locale != null) {
-                    for (var supportedLocale in supportedLocales) {
-                      if (supportedLocale.languageCode == locale.languageCode) {
-                        return supportedLocale;
-                      }
-                    }
-                  }
-                  return supportedLocales.first; // Default to Spanish as configured in l10n.yaml
-                },
-              );
+                }
+              }
+              return supportedLocales.first; // Default to Spanish as configured in l10n.yaml
             },
           );
         },
@@ -196,4 +184,6 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+
+
 

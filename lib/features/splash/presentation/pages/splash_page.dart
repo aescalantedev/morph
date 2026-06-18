@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/navigation/app_router.dart';
 import '../../../settings/presentation/bloc/settings_bloc.dart';
 import '../../../settings/presentation/bloc/settings_state.dart';
+import '../../../shared/presentation/widgets/app_logo.dart';
 
 /// A premium animated startup loading screen that serves as a splash screen,
 /// fully integrated with GoRouter.
@@ -117,7 +118,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Animated Logo
-                AnimatedBuilder(
+                 AnimatedBuilder(
                   animation: _controller,
                   builder: (context, child) {
                     return Opacity(
@@ -128,15 +129,6 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                           width: 90,
                           height: 90,
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                themeColor,
-                                themeColor.withValues(alpha: 0.75),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(28),
                             boxShadow: [
                               BoxShadow(
                                 color: themeColor.withValues(alpha: 0.35),
@@ -145,16 +137,9 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                               ),
                             ],
                           ),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            'M',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 46,
-                              color: Colors.white,
-                              fontFamily: 'Inter',
-                              letterSpacing: -1.0,
-                            ),
+                          child: AppLogo(
+                            size: 90,
+                            color: themeColor,
                           ),
                         ),
                       ),

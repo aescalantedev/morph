@@ -45,7 +45,7 @@
   "themeDark": "Oscuro",
   "themeSystem": "Sistema",
   "systemLanguage": "Por defecto del sistema",
-  "notifications": "Notificaciones de escritorio",
+  "notifications": "Mostrar notificaciones",
   "notificationsDesc": "Mostrar alertas al finalizar conversiones en segundo plano",
   "defaultOutputPath": "Ruta de salida por defecto",
   "systemInfo": "Información del Sistema",
