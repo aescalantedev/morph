@@ -10,7 +10,7 @@
 ---
 
 <div align="center">
-  <video src="./.github/assets/videmo_morph.webm" width="100%" style="border-radius: 10px;" controls autoplay loop muted></video>
+  <img src="./.github/assets/morph_video_converted.gif" alt="Morph Demo" width="100%" style="border-radius: 10px;" />
 </div>
 
 ---
