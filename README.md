@@ -134,7 +134,7 @@ Cosas en las que puedes colaborar:
 Si tienes alguna pregunta, encuentras algún fallo o deseas sugerir una nueva funcionalidad, puedes ponerte en contacto a través de:
 
 *   **📧 Correo de Soporte**: [soporte@aescalante.dev](mailto:soporte@aescalante.dev)
-*   **🌐 Sitio Web Oficial**: [www.aescalante.dev](https://www.aescalante.dev/)
+*   **🌐 Sitio Web Oficial**: [aescalante.dev](https://aescalante.dev/)
 
 ---
 
