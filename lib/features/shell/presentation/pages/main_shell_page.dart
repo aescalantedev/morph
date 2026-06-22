@@ -247,7 +247,7 @@ class _MainShellPageState extends State<MainShellPage> {
             icon: Icons.public_outlined,
             label: 'aescalante.dev',
             tooltip: localizations.visitWebsite,
-            onTap: () => _launchURL('https://www.aescalante.dev/'),
+            onTap: () => _launchURL('https://aescalante.dev/'),
           ),
 
           // Theme Toggle at bottom of sidebar (Brainwave style)
