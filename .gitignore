@@ -42,6 +42,9 @@ migrate_working_dir/
 
 # Platform-specific ephemeral build folders
 /android/key.properties
+/android/keystore_info.txt
+/android/app/upload-keystore.jks
+/releases/
 /ios/Flutter/Generated.xcconfig
 /ios/Flutter/flutter_export_environment.sh
 /ios/Flutter/App.framework
